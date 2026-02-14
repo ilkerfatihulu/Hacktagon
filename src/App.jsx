@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { generateDailyTip } from "./gemini";
+import { generateWeeklyTip } from "./gemini";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -24,6 +25,7 @@ ChartJS.register(
 
 const LS_TODAY = "hydration_today_entries_v1";
 const LS_WEEKLY = "hydration_weekly_averages_v1";
+const LS_DAYCOUNT = "hydration_day_count_v1";
 
 // 1 (very pale) -> 8 (dark amber)
 const URINE_COLORS = [
@@ -49,11 +51,11 @@ const URINE_INSIGHTS = {
 };
 
 const FALLBACK_TIPS = [
-  "Keep a water bottle nearby today.",
-  "Sip water regularly—small sips add up.",
-  "Drink a glass of water before meals.",
-  "Refill your bottle during breaks.",
-  "If your urine looks darker, sip more over the next hour.",
+  "Nice work—aim for steady sipping this week.",
+  "Try a simple goal: refill your bottle 2–3 times today.",
+  "Keep hydration consistent—small sips every hour add up.",
+  "If you’re active, add an extra glass of water after movement.",
+  "Pair water with routine moments (after bathroom, before meals).",
 ];
 
 function readJSON(key, fallback) {
@@ -81,72 +83,88 @@ function pickQuickTip() {
   return FALLBACK_TIPS[Math.floor(Math.random() * FALLBACK_TIPS.length)];
 }
 
+/**
+ * Computes last-7 average + previous-7 average + trend.
+ * nextWeekly: [{avg, ts}, ...] full history
+ */
+function compute7DayTrend(nextWeekly) {
+  const last7 = nextWeekly.slice(-7).map((d) => d.avg);
+  const last7Avg =
+    last7.length === 7
+      ? +(last7.reduce((a, b) => a + b, 0) / 7).toFixed(2)
+      : null;
+
+  const prev7 = nextWeekly.slice(-14, -7).map((d) => d.avg);
+  const prev7Avg =
+    prev7.length === 7
+      ? +(prev7.reduce((a, b) => a + b, 0) / 7).toFixed(2)
+      : null;
+
+  const trend =
+    prev7Avg == null || last7Avg == null
+      ? "stable"
+      : last7Avg < prev7Avg
+      ? "improving"
+      : last7Avg > prev7Avg
+      ? "getting darker"
+      : "stable";
+
+  return { last7Avg, prev7Avg, trend };
+}
+
 export default function App() {
   const [todayEntries, setTodayEntries] = useState(() => readJSON(LS_TODAY, []));
   const [weeklyAverages, setWeeklyAverages] = useState(() => readJSON(LS_WEEKLY, []));
+
   const [selectedColor, setSelectedColor] = useState(null);
   const [toast, setToast] = useState("");
 
-  const [dailyTip, setDailyTip] = useState("Loading tip...");
+  // Weekly tip (NOT daily)
+  const [weeklyTip, setWeeklyTip] = useState("Log 7 days to unlock your weekly tip.");
   const [tipLoading, setTipLoading] = useState(false);
   const [tipErr, setTipErr] = useState("");
 
-  const toastTimer = useRef(null);
+  // Infinite day counter
+  const [dayCount, setDayCount] = useState(() => {
+    const saved = readJSON(LS_DAYCOUNT, null);
+    if (typeof saved === "number") return saved;
+    // fallback: week history + 1
+    const hist = readJSON(LS_WEEKLY, []);
+    return (hist?.length || 0) + 1;
+  });
 
-  function localDayKey() {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
-  }
+  const toastTimer = useRef(null);
 
   useEffect(() => writeJSON(LS_TODAY, todayEntries), [todayEntries]);
   useEffect(() => writeJSON(LS_WEEKLY, weeklyAverages), [weeklyAverages]);
+  useEffect(() => writeJSON(LS_DAYCOUNT, dayCount), [dayCount]);
 
-  // Generate tip ONLY once on mount (prevents double calls)
+  // On mount: set weekly tip message based on how many days completed
   useEffect(() => {
-    const cacheKey = `dailyTip:${localDayKey()}`;
-    const cached = localStorage.getItem(cacheKey);
+    const completedDays = weeklyAverages.length;
 
-    if (cached) {
-      setDailyTip(cached);
+    if (completedDays < 7) {
+      const remaining = 7 - completedDays;
+      setWeeklyTip(`Log ${remaining} more day(s) to unlock your weekly tip.`);
       return;
     }
 
-    // show something immediately
-    const quick = pickQuickTip();
-    setDailyTip(quick);
+    if (completedDays % 7 === 0) {
+      const weekIndex = Math.floor(completedDays / 7);
+      const cacheKey = `weeklyTip:week${weekIndex}`;
+      const cached = localStorage.getItem(cacheKey);
 
-    // update in background with Gemini
-    (async () => {
-      setTipErr("");
-      setTipLoading(true);
-      try {
-        const weeklyAvg =
-          weeklyAverages.length
-            ? +(
-                weeklyAverages.reduce((s, d) => s + d.avg, 0) / weeklyAverages.length
-              ).toFixed(2)
-            : null;
-
-        const lastColor = todayEntries.length ? todayEntries[todayEntries.length - 1].value : null;
-
-        const tip = await generateDailyTip({ weeklyAvg, lastColor });
-        const finalTip = tip || quick;
-
-        setDailyTip(finalTip);
-        localStorage.setItem(cacheKey, finalTip);
-      } catch (e) {
-        setTipErr("Tip update failed (using fallback).");
-      } finally {
-        setTipLoading(false);
+      if (cached) {
+        setWeeklyTip(cached);
+      } else {
+        setWeeklyTip("Weekly tip is ready—press End the day once to generate it.");
       }
-    })();
+    } else {
+      const remaining = 7 - (completedDays % 7);
+      setWeeklyTip(`Log ${remaining} more day(s) to unlock your weekly tip.`);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const dayCount = weeklyAverages.length + 1;
 
   const todayAvg = useMemo(() => {
     if (!todayEntries.length) return null;
@@ -176,58 +194,77 @@ export default function App() {
     const avg = todayAvg ?? 0;
     const item = { avg, ts: Date.now() };
 
-    setWeeklyAverages((prev) => {
-      const next = [...prev, item].slice(-7); // last 7 days
-      return next;
-    });
+    // full history (NO slice(-7))
+    const nextWeekly = [...weeklyAverages, item];
+    setWeeklyAverages(nextWeekly);
 
     setTodayEntries([]);
     setSelectedColor(null);
+
+    // infinite day counter
+    setDayCount((d) => d + 1);
+
     showToast(`Saved today's average: ${avg}`);
 
-    // immediate UI update (no waiting)
-    const quick = pickQuickTip();
-    setDailyTip(quick);
+    // weekly tip logic: only generate when a 7-day block completes
+    const completedDays = nextWeekly.length;
 
-    // clear today's cache so we can store a fresh one
-    const cacheKey = `dailyTip:${localDayKey()}`;
-    localStorage.removeItem(cacheKey);
+    if (completedDays % 7 === 0) {
+      const weekIndex = Math.floor(completedDays / 7);
+      const cacheKey = `weeklyTip:week${weekIndex}`;
+      const cached = localStorage.getItem(cacheKey);
 
-    // Gemini update
-    try {
-      setTipErr("");
-      setTipLoading(true);
+      if (cached) {
+        setWeeklyTip(cached);
+        return;
+      }
 
-      const weeklyAvg =
-        weeklyAverages.length
-          ? +(
-              weeklyAverages.reduce((s, d) => s + d.avg, 0) / weeklyAverages.length
-            ).toFixed(2)
-          : avg;
+      // fallback immediately
+      const quick = pickQuickTip();
+      setWeeklyTip(quick);
 
-      const tip = await generateDailyTip({ weeklyAvg, lastColor: null });
-      const finalTip = tip || quick;
+      try {
+        setTipErr("");
+        setTipLoading(true);
 
-      setDailyTip(finalTip);
-      localStorage.setItem(cacheKey, finalTip);
-    } catch (e) {
-      setTipErr("Tip update failed (using fallback).");
-    } finally {
-      setTipLoading(false);
+        const { last7Avg, trend } = compute7DayTrend(nextWeekly);
+
+        // if somehow not enough data, keep fallback
+        if (last7Avg == null) {
+          setWeeklyTip(quick);
+          localStorage.setItem(cacheKey, quick);
+          return;
+        }
+
+        const tip = await generateWeeklyTip({ last7Avg, trend });
+        const finalTip = (tip && String(tip).trim()) ? String(tip).trim() : quick;
+
+        setWeeklyTip(finalTip);
+        localStorage.setItem(cacheKey, finalTip);
+      } catch (e) {
+        setTipErr("Weekly tip update failed (using fallback).");
+      } finally {
+        setTipLoading(false);
+      }
+    } else {
+      const remaining = 7 - (completedDays % 7);
+      setWeeklyTip(`Log ${remaining} more day(s) to unlock your weekly tip.`);
     }
   }
 
   function resetAll() {
     if (!confirm("Reset demo data (today + weekly)?")) return;
+
     setTodayEntries([]);
     setWeeklyAverages([]);
     setSelectedColor(null);
+    setDayCount(1);
+
     localStorage.removeItem(LS_TODAY);
     localStorage.removeItem(LS_WEEKLY);
+    localStorage.removeItem(LS_DAYCOUNT);
 
-    // optional: clear tip cache for today too
-    localStorage.removeItem(`dailyTip:${localDayKey()}`);
-    setDailyTip("Loading tip...");
+    setWeeklyTip("Log 7 days to unlock your weekly tip.");
     setTipErr("");
     showToast("Reset complete.");
   }
@@ -252,9 +289,11 @@ export default function App() {
     };
   }, [todayEntries]);
 
+  // Weekly chart shows LAST 7 only (but storage keeps all)
   const weeklyData = useMemo(() => {
-    const labels = weeklyAverages.map((d) => formatDateShort(d.ts));
-    const data = weeklyAverages.map((d) => d.avg);
+    const last7 = weeklyAverages.slice(-7);
+    const labels = last7.map((d) => formatDateShort(d.ts));
+    const data = last7.map((d) => d.avg);
     return {
       labels,
       datasets: [
@@ -280,10 +319,7 @@ export default function App() {
         tooltip: { enabled: true },
       },
       scales: {
-        x: {
-          ticks: { maxRotation: 0 },
-          grid: { display: false },
-        },
+        x: { ticks: { maxRotation: 0 }, grid: { display: false } },
         y: {
           min: 1,
           max: 8,
@@ -311,25 +347,25 @@ export default function App() {
     [commonOptions]
   );
 
-  // Simple “AI weekly summary” text (frontend-only demo)
+  // AI Weekly Summary: use last7 vs prev7 trend (clean)
   const aiSummary = useMemo(() => {
     if (!weeklyAverages.length) return "Log a few days to see your weekly trend.";
-    const vals = weeklyAverages.map((d) => d.avg);
-    const avg = +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2);
-    const last = vals[vals.length - 1];
-    const trend =
-      vals.length >= 2
-        ? last < vals[vals.length - 2]
-          ? "improving"
-          : last > vals[vals.length - 2]
-          ? "getting darker"
-          : "stable"
-        : "stable";
+
+    const { last7Avg, trend } = compute7DayTrend(weeklyAverages);
+
+    // if <7 days, compute simple overall avg + simple trend
+    if (last7Avg == null) {
+      const vals = weeklyAverages.map((d) => d.avg);
+      const avg = +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2);
+      return `Weekly avg: ${avg} (trend: stable). Log more days for a 7-day trend.`;
+    }
+
     let note = "Nice!";
-    if (avg <= 3) note = "Hydration looks good overall.";
-    else if (avg <= 5) note = "Moderate—try sipping more regularly.";
+    if (last7Avg <= 3) note = "Hydration looks good overall.";
+    else if (last7Avg <= 5) note = "Moderate—try sipping more regularly.";
     else note = "Darker average—consider increasing fluids today.";
-    return `Weekly avg: ${avg} (trend: ${trend}). ${note}`;
+
+    return `Weekly avg: ${last7Avg} (trend: ${trend}). ${note}`;
   }, [weeklyAverages]);
 
 const urineInsight = useMemo(() => {
@@ -409,8 +445,8 @@ const weeklyReport = useMemo(() => {
         {/* LEFT */}
         <section className="col leftCol" aria-label="Tips and summary">
           <div className="card tipCard">
-            <h3>Daily tip</h3>
-            <p>{dailyTip}</p>
+            <h3>Weekly tip</h3>
+            <p>{weeklyTip}</p>
             {tipLoading ? <p className="muted small">Updating tip…</p> : null}
             {tipErr ? <p className="muted small">{tipErr}</p> : null}
           </div>
@@ -560,7 +596,7 @@ const weeklyReport = useMemo(() => {
           <div className="card chartCard">
             <div className="rowBetween">
               <h3>Weekly chart</h3>
-              <span className="muted small">last {weeklyAverages.length}/7 days</span>
+              <span className="muted small">last {Math.min(weeklyAverages.length, 7)}/7 days</span>
             </div>
             <div className="chartBox" role="img" aria-label="Weekly line chart">
               <Line data={weeklyData} options={weeklyOptions} />
