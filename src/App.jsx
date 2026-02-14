@@ -37,6 +37,13 @@ const URINE_COLORS = [
   { n: 8, hex: "#D9831F", label: "Very dark amber" },
 ];
 
+const FALLBACK_TIPS = [
+  "Keep a water bottle nearby today.",
+  "Sip water regularly—small sips add up.",
+  "Drink a glass of water before meals.",
+  "Refill your bottle during breaks.",
+  "If your urine looks darker, sip more over the next hour.",
+];
 
 function readJSON(key, fallback) {
   try {
@@ -59,58 +66,74 @@ function formatDateShort(ts) {
   return d.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
+function pickQuickTip() {
+  return FALLBACK_TIPS[Math.floor(Math.random() * FALLBACK_TIPS.length)];
+}
+
 export default function App() {
   const [todayEntries, setTodayEntries] = useState(() => readJSON(LS_TODAY, []));
   const [weeklyAverages, setWeeklyAverages] = useState(() => readJSON(LS_WEEKLY, []));
   const [selectedColor, setSelectedColor] = useState(null);
   const [toast, setToast] = useState("");
+
   const [dailyTip, setDailyTip] = useState("Loading tip...");
   const [tipLoading, setTipLoading] = useState(false);
   const [tipErr, setTipErr] = useState("");
 
-
   const toastTimer = useRef(null);
+
+  function localDayKey() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
 
   useEffect(() => writeJSON(LS_TODAY, todayEntries), [todayEntries]);
   useEffect(() => writeJSON(LS_WEEKLY, weeklyAverages), [weeklyAverages]);
-    useEffect(() => {
-    const todayKey = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-    const cacheKey = `dailyTip:${todayKey}`;
 
+  // Generate tip ONLY once on mount (prevents double calls)
+  useEffect(() => {
+    const cacheKey = `dailyTip:${localDayKey()}`;
     const cached = localStorage.getItem(cacheKey);
+
     if (cached) {
       setDailyTip(cached);
       return;
     }
 
-    async function run() {
+    // show something immediately
+    const quick = pickQuickTip();
+    setDailyTip(quick);
+
+    // update in background with Gemini
+    (async () => {
       setTipErr("");
       setTipLoading(true);
       try {
         const weeklyAvg =
           weeklyAverages.length
-            ? +(weeklyAverages.reduce((s, d) => s + d.avg, 0) / weeklyAverages.length).toFixed(2)
+            ? +(
+                weeklyAverages.reduce((s, d) => s + d.avg, 0) / weeklyAverages.length
+              ).toFixed(2)
             : null;
 
-        const lastColor =
-          todayEntries.length ? todayEntries[todayEntries.length - 1].value : null;
+        const lastColor = todayEntries.length ? todayEntries[todayEntries.length - 1].value : null;
 
         const tip = await generateDailyTip({ weeklyAvg, lastColor });
+        const finalTip = tip || quick;
 
-        const finalTip = tip || "Sip water regularly throughout the day.";
         setDailyTip(finalTip);
         localStorage.setItem(cacheKey, finalTip);
       } catch (e) {
-        setTipErr("Tip generation failed. Check API key / limits.");
-        setDailyTip("Sip water regularly throughout the day.");
+        setTipErr("Tip update failed (using fallback).");
       } finally {
         setTipLoading(false);
       }
-    }
-
-    run();
-  }, [weeklyAverages, todayEntries]);
-
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const dayCount = weeklyAverages.length + 1;
 
@@ -119,7 +142,6 @@ export default function App() {
     const sum = todayEntries.reduce((a, e) => a + e.value, 0);
     return +(sum / todayEntries.length).toFixed(2);
   }, [todayEntries]);
-
 
   function showToast(msg) {
     setToast(msg);
@@ -131,62 +153,58 @@ export default function App() {
     const entry = { value, ts: Date.now() };
     setTodayEntries((prev) => [...prev, entry]);
     setSelectedColor(value);
-
-    // micro “interaction” feedback
     showToast(`Logged color ${value} (${URINE_COLORS[value - 1].label})`);
   }
 
-  function localDayKey() {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
+  async function endDay() {
+    if (!todayEntries.length) {
+      showToast("No entries today.");
+      return;
+    }
 
-async function endDay() {
-  if (!todayEntries.length) {
-    showToast("No entries today.");
-    return;
-  }
+    const avg = todayAvg ?? 0;
+    const item = { avg, ts: Date.now() };
 
-  const avg = todayAvg ?? 0;
-  const item = { avg, ts: Date.now() };
+    setWeeklyAverages((prev) => {
+      const next = [...prev, item].slice(-7); // last 7 days
+      return next;
+    });
 
-  setWeeklyAverages((prev) => {
-    const next = [...prev, item].slice(-7); // last 7 days
-    return next;
-  });
+    setTodayEntries([]);
+    setSelectedColor(null);
+    showToast(`Saved today's average: ${avg}`);
 
-  setTodayEntries([]);
-  setSelectedColor(null);
-  showToast(`Saved today's average: ${avg}`);
+    // immediate UI update (no waiting)
+    const quick = pickQuickTip();
+    setDailyTip(quick);
 
-  // 🔥 NEW: generate a fresh tip after ending the day
-  try {
-    setTipErr("");
-    setTipLoading(true);
-
-    const weeklyAvg =
-      weeklyAverages.length
-        ? +(weeklyAverages.reduce((s, d) => s + d.avg, 0) / weeklyAverages.length).toFixed(2)
-        : avg;
-
-    const tip = await generateDailyTip({ weeklyAvg, lastColor: null });
-
-    const finalTip = tip || "Sip water regularly throughout the day.";
-    setDailyTip(finalTip);
-
-    // overwrite today's cache so user sees a new tip immediately
+    // clear today's cache so we can store a fresh one
     const cacheKey = `dailyTip:${localDayKey()}`;
-    localStorage.setItem(cacheKey, finalTip);
-  } catch (e) {
-    setTipErr("Tip generation failed. Check API key / limits.");
-  } finally {
-    setTipLoading(false);
-  }
-}
+    localStorage.removeItem(cacheKey);
 
+    // Gemini update
+    try {
+      setTipErr("");
+      setTipLoading(true);
+
+      const weeklyAvg =
+        weeklyAverages.length
+          ? +(
+              weeklyAverages.reduce((s, d) => s + d.avg, 0) / weeklyAverages.length
+            ).toFixed(2)
+          : avg;
+
+      const tip = await generateDailyTip({ weeklyAvg, lastColor: null });
+      const finalTip = tip || quick;
+
+      setDailyTip(finalTip);
+      localStorage.setItem(cacheKey, finalTip);
+    } catch (e) {
+      setTipErr("Tip update failed (using fallback).");
+    } finally {
+      setTipLoading(false);
+    }
+  }
 
   function resetAll() {
     if (!confirm("Reset demo data (today + weekly)?")) return;
@@ -195,6 +213,11 @@ async function endDay() {
     setSelectedColor(null);
     localStorage.removeItem(LS_TODAY);
     localStorage.removeItem(LS_WEEKLY);
+
+    // optional: clear tip cache for today too
+    localStorage.removeItem(`dailyTip:${localDayKey()}`);
+    setDailyTip("Loading tip...");
+    setTipErr("");
     showToast("Reset complete.");
   }
 
@@ -335,10 +358,10 @@ async function endDay() {
         <section className="col leftCol" aria-label="Tips and summary">
           <div className="card tipCard">
             <h3>Daily tip</h3>
-            <p>{tipLoading ? "Generating..." : dailyTip}</p>
+            <p>{dailyTip}</p>
+            {tipLoading ? <p className="muted small">Updating tip…</p> : null}
             {tipErr ? <p className="muted small">{tipErr}</p> : null}
           </div>
-
 
           <div className="card bigCard">
             <div className="rowBetween">
@@ -413,8 +436,13 @@ async function endDay() {
             </div>
 
             <div className="midBottom">
-              <button className="primaryBtn" onClick={endDay} aria-label="End the day and save today average">
-                End the day
+              <button
+                className="primaryBtn"
+                onClick={endDay}
+                disabled={tipLoading}
+                aria-label="End the day and save today average"
+              >
+                {tipLoading ? "Updating tip..." : "End the day"}
               </button>
               <div className="dayCounter" aria-label="Day counter">
                 Day <strong>{dayCount}</strong>
@@ -448,9 +476,7 @@ async function endDay() {
       </main>
 
       <footer className="footerNote">
-        <p>
-          This app provides hydration guidance only and does not provide medical diagnosis.
-        </p>
+        <p>This app provides hydration guidance only and does not provide medical diagnosis.</p>
       </footer>
 
       {/* Toast */}
