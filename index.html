@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hydration Checker</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --accent:#ff9f55;
+      --dot:#e9ebf2;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(var(--dot) 1px, transparent 1px) 0 0/18px 18px,
+        var(--bg);
+      color:#0f172a;
+    }
+    .app{
+      max-width:1200px;
+      margin:24px auto;
+      padding:12px;
+      display:grid;
+      grid-template-columns: 1fr 1.2fr 1fr;
+      gap:20px;
+      align-items:start;
+    }
+    .header{
+      grid-column: 1 / -1;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      background:#e8f3f1;
+      padding:14px 18px;
+      border-radius:14px;
+    }
+    .bottle{
+      width:34px;height:64px;border:3px solid #6bbfb3;border-radius:8px 8px 10px 10px;
+      position:relative;
+    }
+    .bottle:after{
+      content:""; position:absolute; left:50%; top:-10px; transform:translateX(-50%);
+      width:18px;height:10px;border:3px solid #6bbfb3;border-bottom:none;border-radius:6px 6px 0 0;
+      background:#e8f3f1;
+    }
+    .header h1{margin:0;font-size:22px}
+    .header p{margin:0;color:#334155}
+
+    .card{
+      background:var(--card);
+      border-radius:18px;
+      padding:16px;
+      box-shadow: 0 10px 20px rgba(15,23,42,0.08);
+    }
+
+    .tip{
+      height:180px;
+      display:flex; align-items:center; justify-content:center;
+      border-radius:999px;
+      background:var(--accent);
+      color:white; font-weight:600; text-align:center; padding:24px;
+    }
+    .ai-box{
+      margin-top:16px;
+      height:220px;
+      background:var(--accent);
+      color:white; border-radius:18px;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:600;
+    }
+
+    .colors{
+      display:flex; flex-direction:column; gap:12px;
+      padding:8px;
+    }
+    .color-row{
+      height:48px;
+      border-radius:12px;
+      border:2px solid #fff;
+      cursor:pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .color-row:hover{ transform: translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,.12)}
+
+    .actions{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+    }
+    .btn{
+      flex:1;
+      padding:12px 16px;
+      border-radius:12px;
+      border:none;
+      font-weight:700;
+      cursor:pointer;
+      transition: transform .1s ease, box-shadow .1s ease, opacity .1s ease;
+    }
+    .btn-primary{ background:#0f172a; color:white; }
+    .btn-ghost{ background:#e5e7eb; color:#0f172a; }
+    .btn:hover{ transform: translateY(-1px); box-shadow:0 8px 16px rgba(15,23,42,.15) }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none; transform:none; }
+
+    .chart{
+      height:240px;
+      border-radius:14px;
+      position:relative;
+      overflow:hidden;
+      margin-bottom:16px;
+    }
+    .chart h3{
+      margin:0 0 10px 0;
+      font-size:16px;
+    }
+    .chart .meta{
+      margin:6px 0 0 0;
+      font-weight:600;
+      color:#0f172a;
+    }
+    canvas{
+      width:100%;
+      height:170px;
+      background:#f3f4f6;
+      border-radius:12px;
+      display:block;
+    }
+    .small{
+      color:#334155;
+      font-size:13px;
+      margin-top:6px;
+    }
+
+    @media (max-width: 900px){
+      .app{ grid-template-columns: 1fr; }
+      .header{ grid-column:1; }
+      .ai-box{ height:160px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <div class="header card">
+      <div class="bottle"></div>
+      <div>
+        <h1>Am I drinking enough water?</h1>
+        <p>Use this urine colour chart to check how hydrated you are.</p>
+      </div>
+    </div>
+
+    <!-- Left -->
+    <div>
+      <div class="tip card">Daily Tip for being hydrated</div>
+      <div class="ai-box card">AI Weekly Summarize</div>
+    </div>
+
+    <!-- Center -->
+    <div class="card">
+      <div class="colors" id="colors">
+        <div class="color-row" data-score="1" style="background:#fefce8"></div>
+        <div class="color-row" data-score="2" style="background:#fff7cc"></div>
+        <div class="color-row" data-score="3" style="background:#fff1a8"></div>
+        <div class="color-row" data-score="4" style="background:#ffe56b"></div>
+        <div class="color-row" data-score="5" style="background:#ffd84d"></div>
+        <div class="color-row" data-score="6" style="background:#f3c623"></div>
+        <div class="color-row" data-score="7" style="background:#d1a81f"></div>
+        <div class="color-row" data-score="8" style="background:#a8891a"></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="endDayBtn" disabled>End the Day</button>
+        <button class="btn btn-ghost" id="resetWeekBtn">Reset Week</button>
+      </div>
+      <div class="small">
+        Tip: pick a color after each bathroom visit. End the day to save.
+      </div>
+    </div>
+
+    <!-- Right -->
+    <div>
+      <div class="chart card" id="dailyChart">
+        <h3>Daily Chart</h3>
+        <canvas id="dailyCanvas" width="520" height="220"></canvas>
+        <div class="meta" id="dailyMeta">No data yet</div>
+      </div>
+
+      <div class="chart card" id="weeklyChart">
+        <h3>Weekly Chart</h3>
+        <canvas id="weeklyCanvas" width="520" height="220"></canvas>
+        <div class="meta" id="weeklyMeta">Need 7 days to show weekly chart (0/7)</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ---------- Storage ----------
+    const STORAGE_KEY = "hydration_week_v1"; // array of {dayLabel, avg}
+    function loadWeek(){
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      } catch { return []; }
+    }
+    function saveWeek(arr){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    }
+
+    // ---------- UI State ----------
+    const selections = []; // scores clicked today (1..8)
+    const endDayBtn = document.getElementById('endDayBtn');
+    const resetWeekBtn = document.getElementById('resetWeekBtn');
+
+    const dailyCanvas = document.getElementById('dailyCanvas');
+    const weeklyCanvas = document.getElementById('weeklyCanvas');
+    const dailyMeta = document.getElementById('dailyMeta');
+    const weeklyMeta = document.getElementById('weeklyMeta');
+
+    // ---------- Helpers ----------
+    function avgOf(arr){
+      return arr.reduce((a,b)=>a+b,0) / arr.length;
+    }
+    function todayLabel(){
+      const d = new Date();
+      // short label: Mon, Tue...
+      return d.toLocaleDateString(undefined, { weekday: "short" });
+    }
+
+    // ---------- Chart Drawing (Axes + Line) ----------
+    function drawXYLineChart(canvas, dataY, opts){
+      // opts: { title, xLabel, yLabel, yMin, yMax, xLabels(optional) }
+      const ctx = canvas.getContext('2d');
+
+      // clear
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      // layout
+      const padding = { left: 52, right: 18, top: 18, bottom: 42 };
+      const W = canvas.width, H = canvas.height;
+      const plotW = W - padding.left - padding.right;
+      const plotH = H - padding.top - padding.bottom;
+
+      // background
+      ctx.fillStyle = "#f3f4f6";
+      ctx.fillRect(0,0,W,H);
+
+      // axes
+      ctx.strokeStyle = "#111827";
+      ctx.lineWidth = 2;
+
+      // y-axis
+      ctx.beginPath();
+      ctx.moveTo(padding.left, padding.top);
+      ctx.lineTo(padding.left, padding.top + plotH);
+      ctx.stroke();
+
+      // x-axis
+      ctx.beginPath();
+      ctx.moveTo(padding.left, padding.top + plotH);
+      ctx.lineTo(padding.left + plotW, padding.top + plotH);
+      ctx.stroke();
+
+      const yMin = opts.yMin ?? 1;
+      const yMax = opts.yMax ?? 8;
+
+      // ticks + labels
+      ctx.fillStyle = "#111827";
+      ctx.font = "12px Arial";
+
+      // Y ticks (1..8)
+      const yTicks = 8;
+      for(let i=0;i<yTicks;i++){
+        const v = yMin + i*( (yMax-yMin)/(yTicks-1) );
+        const y = padding.top + plotH - ( (v - yMin) / (yMax - yMin) ) * plotH;
+
+        // tick
+        ctx.beginPath();
+        ctx.moveTo(padding.left - 6, y);
+        ctx.lineTo(padding.left, y);
+        ctx.stroke();
+
+        // label
+        ctx.fillText(v.toFixed(0), 18, y + 4);
+
+        // light grid
+        ctx.strokeStyle = "rgba(17,24,39,0.12)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(padding.left + plotW, y);
+        ctx.stroke();
+        ctx.strokeStyle = "#111827";
+        ctx.lineWidth = 2;
+      }
+
+      // X ticks
+      const n = dataY.length;
+      const xLabels = opts.xLabels || Array.from({length:n}, (_,i)=> String(i+1));
+      const showTicks = Math.min(n, 7);
+
+      for(let i=0;i<n;i++){
+        const x = padding.left + (n===1 ? plotW/2 : (i/(n-1))*plotW);
+        // tick
+        ctx.beginPath();
+        ctx.moveTo(x, padding.top + plotH);
+        ctx.lineTo(x, padding.top + plotH + 6);
+        ctx.stroke();
+
+        // label (avoid clutter if many)
+        if(n <= 12 || i % Math.ceil(n/showTicks) === 0){
+          const label = xLabels[i] ?? String(i+1);
+          ctx.fillText(label, x - 6, padding.top + plotH + 22);
+        }
+      }
+
+      // axis labels
+      ctx.fillStyle = "#111827";
+      ctx.font = "bold 12px Arial";
+      ctx.fillText(opts.xLabel || "X", padding.left + plotW/2 - 20, H - 12);
+
+      // y label rotated
+      ctx.save();
+      ctx.translate(14, padding.top + plotH/2 + 20);
+      ctx.rotate(-Math.PI/2);
+      ctx.fillText(opts.yLabel || "Y", 0, 0);
+      ctx.restore();
+
+      if(n === 0){
+        // no data message
+        ctx.font = "bold 14px Arial";
+        ctx.fillText("No data", padding.left + 20, padding.top + 40);
+        return;
+      }
+
+      // line + points
+      const pts = dataY.map((v,i)=>{
+        const x = padding.left + (n===1 ? plotW/2 : (i/(n-1))*plotW);
+        const y = padding.top + plotH - ((v - yMin)/(yMax - yMin))*plotH;
+        return {x,y};
+      });
+
+      // line
+      ctx.strokeStyle = "#111827";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.stroke();
+
+      // points
+      ctx.fillStyle = "#111827";
+      for(const p of pts){
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+
+    // ---------- Events ----------
+    document.querySelectorAll('.color-row').forEach(row => {
+      row.addEventListener('click', () => {
+        const score = Number(row.dataset.score);
+        selections.push(score);
+        endDayBtn.disabled = false;
+
+        // tiny click feedback
+        row.style.outline = '3px solid #0f172a';
+        setTimeout(() => row.style.outline = 'none', 120);
+
+        // live daily preview (optional): show today's points as they are selected
+        drawDailyFromSelections();
+      });
+    });
+
+    function drawDailyFromSelections(){
+      if(selections.length === 0){
+        drawXYLineChart(dailyCanvas, [], { xLabel:"Visit #", yLabel:"Color score (1-8)", yMin:1, yMax:8 });
+        dailyMeta.textContent = "No data yet";
+        return;
+      }
+      drawXYLineChart(dailyCanvas, selections, {
+        xLabel:"Visit #",
+        yLabel:"Color score (1-8)",
+        yMin:1,
+        yMax:8,
+        xLabels: selections.map((_,i)=> String(i+1))
+      });
+      const avg = avgOf(selections);
+      dailyMeta.textContent = `Today: ${selections.length} entries • Avg: ${avg.toFixed(2)} / 8`;
+    }
+
+    function drawWeeklyFromStorage(){
+      const week = loadWeek();
+      if(week.length < 7){
+        // show empty / partial but still draw if you want (we'll keep chart blank-ish)
+        const y = week.map(d => d.avg);
+        const xLabels = week.map(d => d.dayLabel);
+        drawXYLineChart(weeklyCanvas, y, {
+          xLabel:"Day",
+          yLabel:"Daily avg (1-8)",
+          yMin:1,
+          yMax:8,
+          xLabels
+        });
+        weeklyMeta.textContent = `Need 7 days to show weekly chart (${week.length}/7)`;
+        return;
+      }
+
+      // Exactly last 7 days
+      const last7 = week.slice(-7);
+      drawXYLineChart(weeklyCanvas, last7.map(d=>d.avg), {
+        xLabel:"Day (7 days)",
+        yLabel:"Daily avg (1-8)",
+        yMin:1,
+        yMax:8,
+        xLabels: last7.map(d=>d.dayLabel)
+      });
+
+      const weeklyAvg = avgOf(last7.map(d=>d.avg));
+      weeklyMeta.textContent = `Weekly summary ready ✅ 7/7 • Weekly avg: ${weeklyAvg.toFixed(2)} / 8`;
+    }
+
+    endDayBtn.addEventListener('click', () => {
+      if (selections.length === 0) return;
+
+      // Save today's avg into weekly storage
+      const avg = avgOf(selections);
+      const week = loadWeek();
+      week.push({ dayLabel: todayLabel(), avg: Number(avg.toFixed(2)) });
+
+      // keep only last 7 (hackathon MVP)
+      if(week.length > 7) week.splice(0, week.length - 7);
+
+      saveWeek(week);
+
+      // Draw daily final
+      drawDailyFromSelections();
+
+      // After saving, if 7 days completed, weekly chart should appear (x-y axes)
+      drawWeeklyFromStorage();
+
+      // reset today
+      selections.length = 0;
+      endDayBtn.disabled = true;
+
+      alert("Day saved! 💧");
+    });
+
+    resetWeekBtn.addEventListener('click', () => {
+      localStorage.removeItem(STORAGE_KEY);
+      drawWeeklyFromStorage();
+      alert("Weekly data reset.");
+    });
+
+    // ---------- Initial render ----------
+    drawDailyFromSelections();
+    drawWeeklyFromStorage();
+  </script>
+</body>
+</html>
