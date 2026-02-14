@@ -37,6 +37,17 @@ const URINE_COLORS = [
   { n: 8, hex: "#D9831F", label: "Very dark amber" },
 ];
 
+const URINE_INSIGHTS = {
+  1: { label: "Hydrated", text: "Your urine is very pale, which is a sign of excellent hydration.", action: "Keep doing what you're doing!", color: "#4caf50" },
+  2: { label: "Hydrated", text: "A pale straw color indicates you are well-hydrated.", action: "Maintain your current water intake.", color: "#4caf50" },
+  3: { label: "Healthy", text: "This light yellow shade is considered a healthy baseline.", action: "Sip water throughout the day.", color: "#8bc34a" },
+  4: { label: "Healthy", text: "Your body is generally hydrated, but don't forget to keep drinking.", action: "Have a glass of water soon.", color: "#8bc34a" },
+  5: { label: "Concentrated", text: "Your urine is getting darker, meaning your body is starting to save water.", action: "Drink 1 full glass of water now.", color: "#f39c12" },
+  6: { label: "Concentrated", text: "This amber shade suggests you are likely mildly dehydrated.", action: "Drink 1-2 glasses of water immediately.", color: "#f39c12" },
+  7: { label: "Very Concentrated", text: "Your urine is quite dark. Your body is significantly low on fluids.", action: "Rehydrate with 500ml of water now.", color: "#e74c3c" },
+  8: { label: "Severely Concentrated", text: "Very dark urine is a strong signal that you need fluids immediately.", action: "Drink water now and monitor your next entry.", color: "#e74c3c" },
+};
+
 const FALLBACK_TIPS = [
   "Keep a water bottle nearby today.",
   "Sip water regularly—small sips add up.",
@@ -321,6 +332,47 @@ export default function App() {
     return `Weekly avg: ${avg} (trend: ${trend}). ${note}`;
   }, [weeklyAverages]);
 
+const urineInsight = useMemo(() => {
+  const lastValue = todayEntries.length ? todayEntries[todayEntries.length - 1].value : null;
+  if (!lastValue) return { label: "No Data", text: "Log a color to see hydration insights.", action: "Waiting for log...", color: "#666" };
+  return URINE_INSIGHTS[lastValue];
+}, [todayEntries]);
+
+const weeklyReport = useMemo(() => {
+    // Check if we have at least 7 days of data
+    if (weeklyAverages.length < 7) {
+      return {
+        ready: false,
+        title: "Weekly Kidney Report",
+        text: `Collecting data... (${weeklyAverages.length}/7 days saved).`,
+        status: "In Progress"
+      };
+    }
+
+    // Calculate the average of the last 7 days
+    const totalAvg = weeklyAverages.reduce((sum, day) => sum + day.avg, 0) / 7;
+    
+    let reportText = "";
+    let statusLabel = "";
+    let statusColor = "";
+
+    if (totalAvg <= 3) {
+      statusLabel = "Excellent";
+      statusColor = "#4caf50";
+      reportText = "Over the past week, your kidneys have maintained optimal filtration. Your hydration habits are consistent and healthy.";
+    } else if (totalAvg <= 5) {
+      statusLabel = "Good/Stable";
+      statusColor = "#8bc34a";
+      reportText = "Your weekly average shows stable kidney function, though some days were more concentrated than others. Keep aiming for consistency.";
+    } else {
+      statusLabel = "At Risk of Strain";
+      statusColor = "#e74c3c";
+      reportText = "Your kidneys have been consistently dealing with concentrated waste this week. This can increase the risk of kidney stones. Try to increase your daily water goal.";
+    }
+
+    return { ready: true, title: "7-Day Kidney Report", text: reportText, status: statusLabel, color: statusColor };
+  }, [weeklyAverages]);
+
   return (
     <div className="wrap">
       <header className="topHeader" role="banner">
@@ -363,6 +415,48 @@ export default function App() {
             {tipErr ? <p className="muted small">{tipErr}</p> : null}
           </div>
 
+          {/* UPDATED URINE INSIGHT BOX */}
+          <div className="card tipCard">
+              <h3 style={{ marginBottom: "8px" }}>
+                Urine Analysis: <span style={{ color: urineInsight.color }}>{urineInsight.label}</span>
+              </h3>
+              <p style={{ fontSize: "0.95rem", lineHeight: "1.4" }}>{urineInsight.text}</p>
+            <div style={{ marginTop: "12px", borderTop: "1px solid #eee", paddingTop: "8px" }}>
+              <p className="muted small" style={{ marginBottom: "4px" }}>Hydration Advice:</p>
+              <strong>{urineInsight.action}</strong>
+            </div>
+          </div>
+
+          {/* WEEKLY KIDNEY REPORT BOX */}
+          <div className="card tipCard" style={{ marginTop: "15px" }}>
+            <h3 style={{ marginBottom: "8px" }}>
+              {weeklyReport.title}
+            </h3>
+            
+            {weeklyReport.ready ? (
+              <>
+                <div style={{ marginBottom: "10px" }}>
+                  Status: <strong style={{ color: weeklyReport.color }}>{weeklyReport.status}</strong>
+                </div>
+                <p style={{ fontSize: "0.95rem", lineHeight: "1.4" }}>{weeklyReport.text}</p>
+              </>
+            ) : (
+              <div style={{ textAlign: "center", padding: "10px 0" }}>
+                <p className="muted">{weeklyReport.text}</p>
+                {/* Visual Progress Bar */}
+                <div style={{ width: "100%", background: "#eee", height: "8px", borderRadius: "4px", marginTop: "10px" }}>
+                  <div style={{ 
+                    width: `${(weeklyAverages.length / 7) * 100}%`, 
+                    background: "#3498db", 
+                    height: "100%", 
+                    borderRadius: "4px",
+                    transition: "width 0.3s ease" 
+                  }}></div>
+                </div>
+              </div>
+            )}
+          </div>
+          
           <div className="card bigCard">
             <div className="rowBetween">
               <h3>AI Weekly Summary</h3>
@@ -386,7 +480,7 @@ export default function App() {
                 <div className="statValue">{weeklyAverages.length}</div>
               </div>
             </div>
-
+        
             <div className="log">
               <div className="logHeader">
                 <span>Today’s log</span>
