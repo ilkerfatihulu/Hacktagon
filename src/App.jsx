@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { generateDailyTip } from "./gemini";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -36,13 +37,6 @@ const URINE_COLORS = [
   { n: 8, hex: "#D9831F", label: "Very dark amber" },
 ];
 
-const TIPS = [
-  "Drink a glass of water after waking up.",
-  "Keep a bottle near your desk as a visual reminder.",
-  "If you’re active today, aim for extra fluids.",
-  "Sip regularly—don’t wait until you feel thirsty.",
-  "Pair water with meals to build a habit.",
-];
 
 function readJSON(key, fallback) {
   try {
@@ -70,11 +64,53 @@ export default function App() {
   const [weeklyAverages, setWeeklyAverages] = useState(() => readJSON(LS_WEEKLY, []));
   const [selectedColor, setSelectedColor] = useState(null);
   const [toast, setToast] = useState("");
+  const [dailyTip, setDailyTip] = useState("Loading tip...");
+  const [tipLoading, setTipLoading] = useState(false);
+  const [tipErr, setTipErr] = useState("");
+
 
   const toastTimer = useRef(null);
 
   useEffect(() => writeJSON(LS_TODAY, todayEntries), [todayEntries]);
   useEffect(() => writeJSON(LS_WEEKLY, weeklyAverages), [weeklyAverages]);
+    useEffect(() => {
+    const todayKey = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    const cacheKey = `dailyTip:${todayKey}`;
+
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      setDailyTip(cached);
+      return;
+    }
+
+    async function run() {
+      setTipErr("");
+      setTipLoading(true);
+      try {
+        const weeklyAvg =
+          weeklyAverages.length
+            ? +(weeklyAverages.reduce((s, d) => s + d.avg, 0) / weeklyAverages.length).toFixed(2)
+            : null;
+
+        const lastColor =
+          todayEntries.length ? todayEntries[todayEntries.length - 1].value : null;
+
+        const tip = await generateDailyTip({ weeklyAvg, lastColor });
+
+        const finalTip = tip || "Sip water regularly throughout the day.";
+        setDailyTip(finalTip);
+        localStorage.setItem(cacheKey, finalTip);
+      } catch (e) {
+        setTipErr("Tip generation failed. Check API key / limits.");
+        setDailyTip("Sip water regularly throughout the day.");
+      } finally {
+        setTipLoading(false);
+      }
+    }
+
+    run();
+  }, [weeklyAverages, todayEntries]);
+
 
   const dayCount = weeklyAverages.length + 1;
 
@@ -84,10 +120,6 @@ export default function App() {
     return +(sum / todayEntries.length).toFixed(2);
   }, [todayEntries]);
 
-  const tipOfTheDay = useMemo(() => {
-    const idx = (new Date().getDate() + new Date().getMonth()) % TIPS.length;
-    return TIPS[idx];
-  }, []);
 
   function showToast(msg) {
     setToast(msg);
@@ -104,21 +136,57 @@ export default function App() {
     showToast(`Logged color ${value} (${URINE_COLORS[value - 1].label})`);
   }
 
-  function endDay() {
-    if (!todayEntries.length) {
-      showToast("No entries today.");
-      return;
-    }
-    const avg = todayAvg ?? 0;
-    const item = { avg, ts: Date.now() };
-    setWeeklyAverages((prev) => {
-      const next = [...prev, item].slice(-7); // last 7 days
-      return next;
-    });
-    setTodayEntries([]);
-    setSelectedColor(null);
-    showToast(`Saved today's average: ${avg}`);
+  function localDayKey() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+async function endDay() {
+  if (!todayEntries.length) {
+    showToast("No entries today.");
+    return;
   }
+
+  const avg = todayAvg ?? 0;
+  const item = { avg, ts: Date.now() };
+
+  setWeeklyAverages((prev) => {
+    const next = [...prev, item].slice(-7); // last 7 days
+    return next;
+  });
+
+  setTodayEntries([]);
+  setSelectedColor(null);
+  showToast(`Saved today's average: ${avg}`);
+
+  // 🔥 NEW: generate a fresh tip after ending the day
+  try {
+    setTipErr("");
+    setTipLoading(true);
+
+    const weeklyAvg =
+      weeklyAverages.length
+        ? +(weeklyAverages.reduce((s, d) => s + d.avg, 0) / weeklyAverages.length).toFixed(2)
+        : avg;
+
+    const tip = await generateDailyTip({ weeklyAvg, lastColor: null });
+
+    const finalTip = tip || "Sip water regularly throughout the day.";
+    setDailyTip(finalTip);
+
+    // overwrite today's cache so user sees a new tip immediately
+    const cacheKey = `dailyTip:${localDayKey()}`;
+    localStorage.setItem(cacheKey, finalTip);
+  } catch (e) {
+    setTipErr("Tip generation failed. Check API key / limits.");
+  } finally {
+    setTipLoading(false);
+  }
+}
+
 
   function resetAll() {
     if (!confirm("Reset demo data (today + weekly)?")) return;
@@ -267,8 +335,10 @@ export default function App() {
         <section className="col leftCol" aria-label="Tips and summary">
           <div className="card tipCard">
             <h3>Daily tip</h3>
-            <p>{tipOfTheDay}</p>
+            <p>{tipLoading ? "Generating..." : dailyTip}</p>
+            {tipErr ? <p className="muted small">{tipErr}</p> : null}
           </div>
+
 
           <div className="card bigCard">
             <div className="rowBetween">
