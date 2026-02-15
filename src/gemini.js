@@ -20,8 +20,24 @@ Context:
 Return only the tip sentence.
 `;
 
+  // gemini.js içinde değiştir
+const res = await ai.models.generateContent({
+  model: "gemini-1.0-flash", // Daha stabil olan bu modeli deneyin
+  contents: [{ role: "user", parts: [{ text: prompt }] }], // Yapıyı bu şekilde güncelleyin
+});
+
+  return (res.text || "").trim();
+}
+export async function runChat(message) {
+  const prompt = `
+    You are 'Peki', a friendly hydration and kidney health assistant. 
+    Keep your answers short, helpful, and focused on hydration.
+    If the user asks about medical diagnosis, remind them you are an AI and not a doctor.
+    User says: ${message}
+  `;
+
   const res = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: "gemini-3-flash-preview", // Mevcut modelini kullandım
     contents: prompt,
   });
 
