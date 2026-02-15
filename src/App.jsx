@@ -501,6 +501,8 @@ export default function App() {
         {/* MIDDLE */}
         <section className="col midCol" aria-label="Urine color scale">
           <div className="card scaleCard">
+          </div>  {/* card scaleCard kapanışı */}
+
             <div className="scaleHeader">
               <h3>Urine color (1–8)</h3>
               <p className="muted small">Keyboard: Tab → Enter/Space to log.</p>
