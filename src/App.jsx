@@ -121,16 +121,13 @@ export default function App() {
   const [selectedColor, setSelectedColor] = useState(null);
   const [toast, setToast] = useState("");
 
-  // Weekly tip (NOT daily)
   const [weeklyTip, setWeeklyTip] = useState("Log 7 days to unlock your weekly tip.");
   const [tipLoading, setTipLoading] = useState(false);
   const [tipErr, setTipErr] = useState("");
 
-  // Infinite day counter
   const [dayCount, setDayCount] = useState(() => {
     const saved = readJSON(LS_DAYCOUNT, null);
     if (typeof saved === "number") return saved;
-    // fallback: week history + 1
     const hist = readJSON(LS_WEEKLY, []);
     return (hist?.length || 0) + 1;
   });
@@ -141,7 +138,6 @@ export default function App() {
   useEffect(() => writeJSON(LS_WEEKLY, weeklyAverages), [weeklyAverages]);
   useEffect(() => writeJSON(LS_DAYCOUNT, dayCount), [dayCount]);
 
-  // On mount: set weekly tip message based on how many days completed
   useEffect(() => {
     const completedDays = weeklyAverages.length;
 
@@ -165,7 +161,6 @@ export default function App() {
       const remaining = 7 - (completedDays % 7);
       setWeeklyTip(`Log ${remaining} more day(s) to unlock your weekly tip.`);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const todayAvg = useMemo(() => {
@@ -195,20 +190,14 @@ export default function App() {
 
     const avg = todayAvg ?? 0;
     const item = { avg, ts: Date.now() };
-
-    // full history (NO slice(-7))
     const nextWeekly = [...weeklyAverages, item];
     setWeeklyAverages(nextWeekly);
 
     setTodayEntries([]);
     setSelectedColor(null);
-
-    // infinite day counter
     setDayCount((d) => d + 1);
-
     showToast(`Saved today's average: ${avg}`);
 
-    // weekly tip logic: only generate when a 7-day block completes
     const completedDays = nextWeekly.length;
 
     if (completedDays % 7 === 0) {
@@ -221,7 +210,6 @@ export default function App() {
         return;
       }
 
-      // fallback immediately
       const quick = pickQuickTip();
       setWeeklyTip(quick);
 
@@ -231,7 +219,6 @@ export default function App() {
 
         const { last7Avg, trend } = compute7DayTrend(nextWeekly);
 
-        // if somehow not enough data, keep fallback
         if (last7Avg == null) {
           setWeeklyTip(quick);
           localStorage.setItem(cacheKey, quick);
@@ -271,7 +258,6 @@ export default function App() {
     showToast("Reset complete.");
   }
 
-  // Charts
   const dailyData = useMemo(() => {
     const labels = todayEntries.map((e) => formatTime(e.ts));
     const data = todayEntries.map((e) => e.value);
@@ -291,7 +277,6 @@ export default function App() {
     };
   }, [todayEntries]);
 
-  // Weekly chart shows LAST 7 only (but storage keeps all)
   const weeklyData = useMemo(() => {
     const last7 = weeklyAverages.slice(-7);
     const labels = last7.map((d) => formatDateShort(d.ts));
@@ -349,13 +334,11 @@ export default function App() {
     [commonOptions]
   );
 
-  // AI Weekly Summary: use last7 vs prev7 trend (clean)
   const aiSummary = useMemo(() => {
     if (!weeklyAverages.length) return "Log a few days to see your weekly trend.";
 
     const { last7Avg, trend } = compute7DayTrend(weeklyAverages);
 
-    // if <7 days, compute simple overall avg + simple trend
     if (last7Avg == null) {
       const vals = weeklyAverages.map((d) => d.avg);
       const avg = +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2);
@@ -377,17 +360,16 @@ export default function App() {
   }, [todayEntries]);
 
   const weeklyReport = useMemo(() => {
-    // Check if we have at least 7 days of data
+
     if (weeklyAverages.length < 7) {
       return {
         ready: false,
         title: "Weekly Kidney Report",
         text: `Collecting data... (${weeklyAverages.length}/7 days saved).`,
-        status: "In Progress"
+        status: "In Progress",
       };
     }
 
-    // Calculate the average of the last 7 days
     const totalAvg = weeklyAverages.reduce((sum, day) => sum + day.avg, 0) / 7;
 
     let reportText = "";
@@ -413,35 +395,7 @@ export default function App() {
 
   return (
     <div className="wrap">
-      <header className="topHeader" role="banner">
-        <div className="headerInner">
-          <div className="bottleIcon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path
-                d="M10 2h4v2l1 1v2H9V5l1-1V2Z"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M9 7h6v14a1.8 1.8 0 0 1-1.8 1.8h-2.4A1.8 1.8 0 0 1 9 21V7Z"
-                stroke="currentColor"
-                strokeWidth="1.8"
-              />
-              <path
-                d="M10.2 14.2c.9.9 2.7.9 3.6 0"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
-          <div className="titleBlock">
-            <h1>Am I drinking enough water?</h1>
-            <p>Track hydration using a urine colour scale (1–8). Tap a color to log it.</p>
-          </div>
-        </div>
-      </header>
+     
 
       <main className="grid" role="main">
         {/* LEFT */}
@@ -453,7 +407,6 @@ export default function App() {
             {tipErr ? <p className="muted small">{tipErr}</p> : null}
           </div>
 
-          {/* UPDATED URINE INSIGHT BOX */}
           <div className="card tipCard">
             <h3 style={{ marginBottom: "8px" }}>
               Urine Analysis: <span style={{ color: urineInsight.color }}>{urineInsight.label}</span>
@@ -465,12 +418,15 @@ export default function App() {
             </div>
           </div>
 
-          {/* WEEKLY KIDNEY REPORT BOX */}
           <div className="card tipCard" style={{ marginTop: "15px" }}>
+<<<<<<< HEAD
             <h3 style={{ marginBottom: "8px" }}>
               {weeklyReport.title}
             </h3>
 
+=======
+            <h3 style={{ marginBottom: "8px" }}>{weeklyReport.title}</h3>
+>>>>>>> d6cdd96e9d3fecc0ec34badea77168913b127263
             {weeklyReport.ready ? (
               <>
                 <div style={{ marginBottom: "10px" }}>
@@ -481,8 +437,8 @@ export default function App() {
             ) : (
               <div style={{ textAlign: "center", padding: "10px 0" }}>
                 <p className="muted">{weeklyReport.text}</p>
-                {/* Visual Progress Bar */}
                 <div style={{ width: "100%", background: "#eee", height: "8px", borderRadius: "4px", marginTop: "10px" }}>
+<<<<<<< HEAD
                   <div style={{
                     width: `${(weeklyAverages.length / 7) * 100}%`,
                     background: "#3498db",
@@ -490,6 +446,17 @@ export default function App() {
                     borderRadius: "4px",
                     transition: "width 0.3s ease"
                   }}></div>
+=======
+                  <div
+                    style={{
+                      width: `${(weeklyAverages.length / 7) * 100}%`,
+                      background: "#3498db",
+                      height: "100%",
+                      borderRadius: "4px",
+                      transition: "width 0.3s ease",
+                    }}
+                  ></div>
+>>>>>>> d6cdd96e9d3fecc0ec34badea77168913b127263
                 </div>
               </div>
             )}
@@ -568,14 +535,10 @@ export default function App() {
             </div>
 
             <div className="midBottom">
-              <button
-                className="primaryBtn"
-                onClick={endDay}
-                disabled={tipLoading}
-                aria-label="End the day and save today average"
-              >
+              <button className="primaryBtn" onClick={endDay} disabled={tipLoading}>
                 {tipLoading ? "Updating tip..." : "End the day"}
               </button>
+<<<<<<< HEAD
               <PhotoAnalyzeButton
                 onDetectedLevel={(level) => {
                   // Burada senin mevcut loglama fonksiyonunu çağır:
@@ -584,6 +547,9 @@ export default function App() {
                 }}
               />
               <div className="dayCounter" aria-label="Day counter">
+=======
+              <div className="dayCounter">
+>>>>>>> d6cdd96e9d3fecc0ec34badea77168913b127263
                 Day <strong>{dayCount}</strong>
               </div>
             </div>
@@ -597,7 +563,7 @@ export default function App() {
               <h3>Daily chart</h3>
               <span className="muted small">{todayAvg !== null ? `avg ${todayAvg}` : "no data"}</span>
             </div>
-            <div className="chartBox" role="img" aria-label="Daily line chart">
+            <div className="chartBox">
               <Line data={dailyData} options={commonOptions} />
             </div>
           </div>
@@ -607,7 +573,7 @@ export default function App() {
               <h3>Weekly chart</h3>
               <span className="muted small">last {Math.min(weeklyAverages.length, 7)}/7 days</span>
             </div>
-            <div className="chartBox" role="img" aria-label="Weekly line chart">
+            <div className="chartBox">
               <Line data={weeklyData} options={weeklyOptions} />
             </div>
           </div>
@@ -618,7 +584,6 @@ export default function App() {
         <p>This app provides hydration guidance only and does not provide medical diagnosis.</p>
       </footer>
 
-      {/* Toast */}
       <div className={`toast ${toast ? "show" : ""}`} role="status" aria-live="polite">
         {toast}
       </div>
