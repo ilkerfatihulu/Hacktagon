@@ -186,8 +186,14 @@ body{
 .logText{ font-size: 13px; }
 
 .scaleCard{
+    /* Border rengini ve kalınlığını buradan ayarlayabilirsin */
+  border-radius: 8px;      /* Köşe yuvarlama (isteğe bağlı) */
+  padding: 10px;           /* İç boşluk */
+  margin: 5px;             /* Kartlar arasında mesafe */
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 12px;
 }
 .scaleHeader h3{ margin: 0; }
