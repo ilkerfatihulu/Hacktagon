@@ -419,14 +419,12 @@ export default function App() {
           </div>
 
           <div className="card tipCard" style={{ marginTop: "15px" }}>
-<<<<<<< HEAD
+
             <h3 style={{ marginBottom: "8px" }}>
               {weeklyReport.title}
             </h3>
 
-=======
-            <h3 style={{ marginBottom: "8px" }}>{weeklyReport.title}</h3>
->>>>>>> d6cdd96e9d3fecc0ec34badea77168913b127263
+
             {weeklyReport.ready ? (
               <>
                 <div style={{ marginBottom: "10px" }}>
@@ -438,7 +436,7 @@ export default function App() {
               <div style={{ textAlign: "center", padding: "10px 0" }}>
                 <p className="muted">{weeklyReport.text}</p>
                 <div style={{ width: "100%", background: "#eee", height: "8px", borderRadius: "4px", marginTop: "10px" }}>
-<<<<<<< HEAD
+
                   <div style={{
                     width: `${(weeklyAverages.length / 7) * 100}%`,
                     background: "#3498db",
@@ -446,17 +444,7 @@ export default function App() {
                     borderRadius: "4px",
                     transition: "width 0.3s ease"
                   }}></div>
-=======
-                  <div
-                    style={{
-                      width: `${(weeklyAverages.length / 7) * 100}%`,
-                      background: "#3498db",
-                      height: "100%",
-                      borderRadius: "4px",
-                      transition: "width 0.3s ease",
-                    }}
-                  ></div>
->>>>>>> d6cdd96e9d3fecc0ec34badea77168913b127263
+
                 </div>
               </div>
             )}
@@ -538,7 +526,7 @@ export default function App() {
               <button className="primaryBtn" onClick={endDay} disabled={tipLoading}>
                 {tipLoading ? "Updating tip..." : "End the day"}
               </button>
-<<<<<<< HEAD
+
               <PhotoAnalyzeButton
                 onDetectedLevel={(level) => {
                   // Burada senin mevcut loglama fonksiyonunu çağır:
@@ -547,9 +535,9 @@ export default function App() {
                 }}
               />
               <div className="dayCounter" aria-label="Day counter">
-=======
+
               <div className="dayCounter">
->>>>>>> d6cdd96e9d3fecc0ec34badea77168913b127263
+
                 Day <strong>{dayCount}</strong>
               </div>
             </div>
