@@ -574,9 +574,55 @@ export default function App() {
             )}
           </div>
 
-          <div className="card bigCard">
+          
+        </section>
+
+        {/* MIDDLE */}
+        <section className="col midCol" aria-label="Urine color scale">
+          {/* 1) Urine level card */}
+          <div className="card scaleCard">
+            <div className="scaleHeader">
+              <h3>Urine color (1–8)</h3>
+              <p className="muted small">Keyboard: Tab → Enter/Space to log.</p>
+            </div>
+
+            <div className="scale" role="list" aria-label="Urine color blocks">
+              {URINE_COLORS.map((c) => (
+                <button
+                  key={c.n}
+                  type="button"
+                  className={`colorBlock ${selectedColor === c.n ? "selected" : ""}`}
+                  style={{ background: c.hex }}
+                  onClick={() => addEntry(c.n)}
+                  aria-label={`Log color ${c.n}: ${c.label}`}
+                >
+                  <span className="blockNum">{c.n}</span>
+                  <span className="blockLabel">{c.label}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="midBottom">
+              <div className="actionRow">
+                <button className="primaryBtn" onClick={endDay} disabled={tipLoading}>
+                  {tipLoading ? "Updating tip..." : "End the day"}
+                </button>
+
+                <PhotoAnalyzeButton onDetectedLevel={(level) => addEntry(level)} />
+              </div>
+            </div>
+          </div>
+
+          {/* 2) Progress card (AYRI KART) */}
+          
+        </section>
+
+        {/* RIGHT */}
+        <section className="col rightCol" aria-label="Charts">
+          
+        <div className="card bigCard">
             <div className="rowBetween">
-              <h3>AI Weekly Summary</h3>
+              <h3>Weekly Summary</h3>
               <button className="ghostBtn" onClick={resetAll} aria-label="Reset demo data">
                 Reset
               </button>
@@ -621,77 +667,7 @@ export default function App() {
                 )}
               </ul>
             </div>
-          </div>
-        </section>
-
-        {/* MIDDLE */}
-        <section className="col midCol" aria-label="Urine color scale">
-          {/* 1) Urine level card */}
-          <div className="card scaleCard">
-            <div className="scaleHeader">
-              <h3>Urine color (1–8)</h3>
-              <p className="muted small">Keyboard: Tab → Enter/Space to log.</p>
-            </div>
-
-            <div className="scale" role="list" aria-label="Urine color blocks">
-              {URINE_COLORS.map((c) => (
-                <button
-                  key={c.n}
-                  type="button"
-                  className={`colorBlock ${selectedColor === c.n ? "selected" : ""}`}
-                  style={{ background: c.hex }}
-                  onClick={() => addEntry(c.n)}
-                  aria-label={`Log color ${c.n}: ${c.label}`}
-                >
-                  <span className="blockNum">{c.n}</span>
-                  <span className="blockLabel">{c.label}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className="midBottom">
-              <div className="actionRow">
-                <button className="primaryBtn" onClick={endDay} disabled={tipLoading}>
-                  {tipLoading ? "Updating tip..." : "End the day"}
-                </button>
-
-                <PhotoAnalyzeButton onDetectedLevel={(level) => addEntry(level)} />
-              </div>
-            </div>
-          </div>
-
-          {/* 2) Progress card (AYRI KART) */}
-          <div className="card counterOnlyCard" aria-label="Progress counters">
-            <div className="rowBetween">
-              <h3>Progress</h3>
-              <span className="muted small">tracking</span>
-            </div>
-
-            <div className="counterRow">
-              <div className="counterPill">
-                Day <strong>{dayCount}</strong>
-              </div>
-
-              <div className="counterPill">
-                Week <strong>{weekNumber}</strong>{" "}
-                <span className="counterSub">({weekProgress}/7)</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* RIGHT */}
-        <section className="col rightCol" aria-label="Charts">
-          <div className="card chartCard">
-            <div className="rowBetween">
-              <h3>Daily chart</h3>
-              <span className="muted small">{todayAvg !== null ? `avg ${todayAvg}` : "no data"}</span>
-            </div>
-            <div className="chartBox">
-              <Line data={dailyData} options={commonOptions} />
-            </div>
-          </div>
-
+          </div> 
           <div className="card chartCard">
             <div className="rowBetween">
               <h3>Weekly chart</h3>
