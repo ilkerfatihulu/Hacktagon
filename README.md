@@ -1,19 +1,43 @@
-# React + Vite
+🛡️ KidneyGuard
+Track. Care. Live.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+KidneyGuard is an AI-powered hydration tracking application designed to help users maintain optimal kidney health. Inspired by personal experience and driven by a mission to raise awareness, KidneyGuard turns simple hydration data into actionable health insights.
 
-Currently, two official plugins are available:
+🌟 Inspiration
+This project is more than just code. After losing my grandfather to kidney disease, I realized how vital early tracking and consistent hydration are for long-term health. I created KidneyGuard to empower people with the tools they need to build healthy habits and proactively care for their kidneys.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+✨ Key Features
+AI-Powered Hydration Coaching: Get personalized weekly tips based on your 7-day hydration trends.
 
-## React Compiler
+Smart Photo Detection: Don't know your hydration level? Upload a photo, and our Pixel Analysis Algorithm will suggest the most accurate level.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+"Peki" AI Assistant: A real-time chatbot integrated via Google Gemini API to answer all your questions about kidney wellness and hydration essentials.
 
-## Expanding the ESLint configuration
+Privacy-First Architecture: Your health data is yours alone. We use a Local-First strategy where all entries are stored on your device using localStorage.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Dynamic Analytics: Visualize your progress with interactive daily and weekly charts powered by Chart.js.
 
-read me
-test
+🛠️ Tech Stack
+Frontend: React (Vite), CSS3 (Custom Variables/Glassmorphism)
+
+AI Engine: Google Gemini 1.5 Flash & Gemini 3 Flash Preview
+
+Data Visualization: Chart.js
+
+Icons: Lucide React
+
+Storage: Web Storage API (localStorage)
+
+⚠️ Challenges & Learning
+Group Dynamics: Navigating the learning curve of team collaboration and aligning different visions under pressure.
+
+Technical Knowledge Gap: Mastering API security, environment variables, and the steep learning curve of GitHub version control.
+
+Hardware/API Latency: We encountered some latency issues with external AI calls. While not ideal for real-time performance, we confirmed it was an external API limitation and are exploring optimizations.
+
+🚀 What's Next?
+Mobile Integration: Transitioning to a native mobile app for on-the-go tracking.
+
+Performance: Optimizing AI response speeds and refining our computer vision logic.
+
+Secure Cloud Sync: Implementing an optional, encrypted cloud-sync system for multi-device access.
