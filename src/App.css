@@ -270,13 +270,6 @@ body{
   outline-offset: 2px;
 }
 
-.dayCounter{
-  border: 1px solid var(--border);
-  background: rgba(16,42,67,0.03);
-  padding: 10px 12px;
-  border-radius: 14px;
-  font-size: 13px;
-}
 
 .chartCard h3{ margin: 0; }
 .chartBox{
@@ -414,8 +407,88 @@ body{
 html, body, #root {
   background: #FFFDF2;   /* 👈 istediğin renk */
 }
+/* ============================================================
+   STYLE A: PHOTO ANALYZE (Animated / Disappearing Text)
+   ============================================================ */
+.photo-upload-btn {
+  font-family: inherit;
+  font-size: 14px; /* Scaled down for your layout */
+  background: #212121;
+  color: white;
+  padding: 0.7em 1em;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border: none;
+  border-radius: 15px;
+  font-weight: 700;
+  transition: all 0.3s;
+}
 
+.photo-upload-btn span {
+  display: block;
+  margin-left: 0.5em;
+  transition: all 0.3s ease-in-out;
+}
 
+.photo-upload-btn svg {
+  display: block;
+  transform-origin: center center;
+  transition: transform 0.3s ease-in-out;
+  fill: #9b9999;
+}
+
+.photo-upload-btn:hover {
+  background: #000;
+}
+
+.photo-upload-btn:hover .svg-wrapper {
+  transform: scale(1.25);
+  transition: 0.5s linear;
+}
+
+.photo-upload-btn:hover svg {
+  /* This moves the camera to the center when text disappears */
+  transform: translateX(2.5em) scale(1.1); 
+  fill: #fff;
+}
+
+.photo-upload-btn:hover span {
+  opacity: 0;
+  transition: 0.5s linear;
+}
+
+.photo-upload-btn:active {
+  transform: scale(0.95);
+}
+
+/* ============================================================
+   STYLE B: END THE DAY (3D Floating Style)
+   ============================================================ */
+.primaryBtn {
+  background: var(--btn);
+  color: var(--btnText);
+  border: 1px solid transparent;
+  padding: 11px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+.primaryBtn:hover {
+  /* Floating 3D effect from your first style */
+  transform: translateY(-6px);
+  box-shadow: 0 6px rgba(0, 0, 0, 0.4);
+  background: #000;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.primaryBtn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
 
 
 

@@ -568,9 +568,6 @@ export default function App() {
 
               <PhotoAnalyzeButton onDetectedLevel={(level) => addEntry(level)} />
 
-              <div className="dayCounter" aria-label="Day counter">
-                Day <strong>{dayCount}</strong>
-              </div>
             </div>
           </div>
         </section>

@@ -141,4 +141,45 @@ button:focus-visible {
     font-size: 18px;
   }
 }
+/* Custom Photo Analyze Button - KidneyGuard Style */
+
+.photo-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  
+  /* Matches your brandLogo and siteHeader styling */
+  background-color: #ffffff;
+  border: 2px solid rgba(0, 0, 0, 0.75); 
+  border-radius: 12px;
+  padding: 10px 18px;
+  
+  color: #213547;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  /* Subtle shadow for depth */
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+}
+
+.photo-upload-btn:hover {
+  background-color: #f9f9f9;
+  transform: translateY(-1px);
+  box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+  border-color: #646cff; /* Matches your 'a:hover' link color */
+}
+
+.photo-upload-btn:active {
+  transform: translateY(1px);
+  box-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+}
+
+.photo-upload-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
 
