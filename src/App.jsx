@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import "./App.css";
 import { generateWeeklyTip } from "./gemini";
 import PhotoAnalyzeButton from "./PhotoAnalyzeButton";
+
 
 import {
   Chart as ChartJS,
@@ -269,6 +271,7 @@ export default function App() {
           pointRadius: 4,
           pointHoverRadius: 6,
           borderWidth: 2,
+          
         },
       ],
     };
@@ -407,6 +410,22 @@ export default function App() {
 
   return (
     <div className="wrap">
+      {/* HEADER (BURAYA EKLE) */}
+    <header className="siteHeader" role="banner">
+      <div className="siteHeaderInner">
+        <div className="brand">
+          <img src="/KidneyGuard.png" alt="KidneyGuard Logo" className="brandLogo" />
+          <div className="brandText">
+            <div className="brandName">KidneyGuard</div>
+            <div className="brandSub">Kidney health tracking</div>
+          </div>
+        </div>
+
+        <div className="tagline">Track. Care. Live.</div>
+      </div>
+    </header>
+
+    {/* BURASI ZATEN SENDE VARDI, AYNI KALIYOR */}
       <main className="grid" role="main">
         {/* LEFT */}
         <section className="col leftCol" aria-label="Tips and summary">

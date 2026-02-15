@@ -66,3 +66,79 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+/* ===== Header (like your screenshot) ===== */
+
+.siteHeader{
+  width: 100%;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+
+  /* dotted background */
+  background-color: #fff;
+  background-image: radial-gradient(rgba(0,0,0,0.12) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.siteHeaderInner{
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 0 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brandLogo{
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  object-fit: contain;
+  background: #fff;
+  border: 2px solid rgba(0,0,0,0.75);
+  padding: 8px;
+}
+
+.brandText{
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brandName{
+  font-size: 24px;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+}
+
+.brandSub{
+  margin-top: 4px;
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.tagline{
+  font-size: 22px;
+  font-weight: 550;
+  opacity: 0.9;
+  white-space: nowrap;
+}
+
+/* mobile */
+@media (max-width: 640px){
+  .siteHeaderInner{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .tagline{
+    font-size: 18px;
+  }
+}
+

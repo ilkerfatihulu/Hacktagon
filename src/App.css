@@ -3,11 +3,11 @@
   --card: #ffffff;
   --text: #102a43;
   --muted: #627d98;
-  --border: rgba(16, 42, 67, 0.10);
-  --shadow: 0 10px 30px rgba(16, 42, 67, 0.10);
+  --border: rgba(95, 231, 215, 0.1);
+  --shadow: 0 10px 30px rgba(16, 42, 67, 0.30);
   --radius: 18px;
 
-  --btn: #0b5fff;
+  --btn: #000000d4;
   --btnText: #ffffff;
 }
 
@@ -338,4 +338,85 @@ body{
 .topHeader {
   display: none !important;
 }
+/* ===== Header ===== */
+.siteHeader{
+  width: 100%;
+  padding: 18px 0;
+  border-bottom: none;
+
+  background: transparent;  /* 👈 DIŞ KATMAN ŞEFFAF */
+  
+}
+
+.siteHeaderInner{
+  width: min(1200px, 100%);
+  margin: 12px auto 0;  /* üstten biraz boşluk */
+  padding: 12px 18px;
+  box-shadow: var(--shadow); 
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  
+
+  background: #ffffff;          /* kart gibi dursun */
+  border-radius: 16px;          /* 👈 köşeleri yuvarla */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.30); /* hafif gölge (opsiyonel) */
+}
+
+.brand{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brandLogo{
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  object-fit: contain;
+  background: #fff;
+  border: 2px solid rgba(0,0,0,0.75);
+  padding: 8px;
+}
+
+.brandName{
+  font-size: 24px;
+  font-weight: 650;
+}
+
+.brandSub{
+  font-size: 13px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.tagline{
+  font-size: 22px;
+  font-weight: 550;
+  opacity: 0.9;
+  white-space: nowrap;
+}
+
+/* mobile */
+@media (max-width: 640px){
+  .siteHeaderInner{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .tagline{
+    font-size: 18px;
+  }
+}
+/* Sayfanın genel arka planı */
+html, body, #root {
+  background: #FFFDF2;   /* 👈 istediğin renk */
+}
+
+
+
+
+
 
