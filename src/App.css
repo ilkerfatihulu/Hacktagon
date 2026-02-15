@@ -31,6 +31,7 @@ body{
   display: flex;
   flex-direction: column;
   gap: 16px;
+  
 }
 
 .topHeader{
@@ -285,6 +286,74 @@ body{
   padding: 8px 0;
 }
 
+/* ===== Bottom 50/50 section (Get Started + AI placeholder) ===== */
+.bottomSplit{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.getStartedCard{
+  padding: 22px;
+}
+
+.gsTitle{
+  font-family: 'Work Sans', sans-serif;
+  font-style: italic;  
+  margin: 0 0 10px;
+  font-size: 28px;
+  letter-spacing: -0.4px;
+}
+
+.gsIntro{
+  margin: 0 0 18px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.gsSubTitle{
+  font-family: 'Work Sans', sans-serif;
+  font-style: italic;
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-style: italic;
+}
+
+.gsList{
+  font-family: 'Work Sans', sans-serif;
+  font-style: italic;
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.gsList li ul{
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+.aiCard{
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+}
+
+.aiTitle{
+  margin: 0;
+  font-size: 20px;
+}
+
+.aiBody{
+  flex: 1;
+  margin-top: 12px;
+  border-radius: 14px;
+  border: 1px dashed rgba(16,42,67,0.18);
+  background: rgba(16,42,67,0.02);
+}
+
 .toast{
   position: fixed;
   left: 50%;
@@ -309,6 +378,7 @@ body{
   .grid{ grid-template-columns: 1fr; }
   .tipCard{ border-radius: var(--radius); min-height: auto; }
   .chartBox{ height: 240px; }
+  .bottomSplit{ grid-template-columns: 1fr; }
 }
 .midBottom {
   display: flex;
@@ -357,6 +427,9 @@ body{
   background: #ffffff;          /* kart gibi dursun */
   border-radius: 16px;          /* 👈 köşeleri yuvarla */
   box-shadow: 0 8px 24px rgba(0,0,0,0.30); /* hafif gölge (opsiyonel) */
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .brand{
@@ -381,14 +454,17 @@ body{
 }
 
 .brandSub{
-  font-size: 13px;
+  font-size: 12px;
   opacity: 0.7;
   margin-top: 4px;
+  font-weight: 1;
 }
 
 .tagline{
-  font-size: 22px;
-  font-weight: 550;
+  font-family: 'Work Sans', cursive;
+  font-weight: 400;        /* tek seçenek */
+  letter-spacing: 1px;
+  font-size: 25px;
   opacity: 0.9;
   white-space: nowrap;
 }
@@ -410,20 +486,25 @@ html, body, #root {
 /* ============================================================
    STYLE A: PHOTO ANALYZE (Animated / Disappearing Text)
    ============================================================ */
-.photo-upload-btn {
-  font-family: inherit;
-  font-size: 14px; /* Scaled down for your layout */
-  background: #212121;
-  color: white;
-  padding: 0.7em 1em;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  border: none;
-  border-radius: 15px;
-  font-weight: 700;
-  transition: all 0.3s;
-}
+   .photo-upload-btn {
+    font-family: inherit;
+    font-size: 14px;
+    background: #212121;
+    color: white;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    border: none;
+    border-radius: 15px;
+    font-weight: 700;
+    transition: all 0.3s;
+    height: 40px;
+    flex: 1;
+    justify-content: center;
+    margin-left: auto;   /* 👈 sadece bunu ekle */
+  }
+  
 
 .photo-upload-btn span {
   display: block;
@@ -469,12 +550,18 @@ html, body, #root {
   background: var(--btn);
   color: var(--btnText);
   border: 1px solid transparent;
-  padding: 11px 18px;
+  padding: 0 20px;
   border-radius: 12px;
   cursor: pointer;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 14px;
   transition: 0.2s;
+  height: 40px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+
 }
 
 .primaryBtn:hover {
@@ -497,6 +584,7 @@ html, body, #root {
   justify-content: space-between;
   margin-top: 14px;
 }
+
 
 /* Separate progress card under scaleCard */
 .counterOnlyCard{
@@ -529,6 +617,18 @@ html, body, #root {
 }
 
 
+.orbitronTitle {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.kidneyGuardTitle {
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 300;
+  font-size: 30px;
+  letter-spacing: 1px;
+}
 
 
 

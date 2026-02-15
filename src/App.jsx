@@ -3,6 +3,7 @@ import "./App.css";
 import { generateWeeklyTip } from "./gemini";
 import PhotoAnalyzeButton from "./PhotoAnalyzeButton";
 
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -477,7 +478,7 @@ export default function App() {
           <div className="brand">
             <img src="/KidneyGuard.png" alt="KidneyGuard Logo" className="brandLogo" />
             <div className="brandText">
-              <div className="brandName">KidneyGuard</div>
+              <div className="brandName kidneyGuardTitle" >KidneyGuard</div>
               <div className="brandSub">Kidney health tracking</div>
             </div>
           </div>
@@ -668,6 +669,65 @@ export default function App() {
           </div>
         </section>
       </main>
+
+      {/* GET STARTED + AI (below dashboard) */}
+      <section className="bottomSplit" aria-label="Get started and AI assistant">
+        <div className="card getStartedCard">
+          <h2 className="gsTitle">Smartly track your kidney health.</h2>
+          <p className="gsIntro">
+            KidneyGuard helps you log hydration with quick inputs and clear visual insights,
+            powered by AI, so you can stay consistent, spot trends over time, and make
+            smarter daily choices to better care for your kidneys.
+          </p>
+
+          <h3 className="gsSubTitle">Follow the steps below to get started:</h3>
+
+          <ol className="gsList">
+            <li>
+              <strong>Log a Color:</strong>
+              <ul>
+                <li>Choose the color that matches your current hydration.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Add Multiple Entries (Optional):</strong>
+              <ul>
+                <li>Log more than once during the day to get a more accurate daily average.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Use Photo Detection (Optional):</strong>
+              <ul>
+                <li>
+                  If you’re unsure about the color, try photo-based detection. It may not be
+                  100% accurate, but it can help guide your choice.
+                </li>
+              </ul>
+            </li>
+            <li>
+              <strong>View Insights:</strong>
+              <ul>
+                <li>Review your daily and weekly charts to spot patterns and trends.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Get AI Guidance:</strong>
+              <ul>
+                <li>
+                  With the help of AI, receive simple tips and weekly summaries to improve your
+                  hydration habits.
+                </li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+
+        <div className="card aiCard">
+          <h3 className="aiTitle">AI Assistant</h3>
+          {/* Placeholder on purpose — AI chatbot will be embedded here later */}
+          <div className="aiBody" />
+        </div>
+      </section>
 
       <footer className="footerNote">
         <p>This app provides hydration guidance only and does not provide medical diagnosis.</p>
