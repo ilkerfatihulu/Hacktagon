@@ -3,6 +3,8 @@ import "./App.css";
 import PhotoAnalyzeButton from "./PhotoAnalyzeButton";
 import { generateWeeklyTip, runChat } from "./gemini";
 import { Send, Paperclip, Minus } from 'lucide-react';
+import SplashScreen from './SplashScreen';
+import './SplashScreen.css'; 
 
 
 import {
@@ -157,6 +159,15 @@ function compute7DayTrend(nextWeekly) {
 }
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true); // State to control splash screen visibility
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false); // Hide splash screen after 3 seconds
+    }, 3000);
+    return () => clearTimeout(timer); // Cleanup timer
+  }, []);
+
   const [todayEntries, setTodayEntries] = useState(() => readJSON(LS_TODAY, []));
   const [weeklyAverages, setWeeklyAverages] = useState(() =>
     readJSON(LS_WEEKLY, [])
@@ -238,7 +249,7 @@ export default function App() {
       const remaining = 7 - (completedDays % 7);
       setWeeklyTip(`Log ${remaining} more day(s) to unlock your weekly tip.`);
     }
-  }, []); // run once
+  }, []);
 
   const todayAvg = useMemo(() => {
     if (!todayEntries.length) return null;
@@ -246,13 +257,13 @@ export default function App() {
     return +(sum / todayEntries.length).toFixed(2);
   }, [todayEntries]);
 
-  // ✅ Week counter
+  //Week counter
   const weekNumber = useMemo(() => {
     if (!weeklyAverages.length) return 1;
     return Math.floor((weeklyAverages.length - 1) / 7) + 1;
   }, [weeklyAverages]);
 
-  // ✅ This week's progress (1..7)
+  //This week's progress (1..7)
   const weekProgress = useMemo(() => {
     const mod = weeklyAverages.length % 7;
     return mod === 0 && weeklyAverages.length > 0 ? 7 : mod;
@@ -461,7 +472,7 @@ export default function App() {
     return URINE_INSIGHTS[lastValue];
   }, [todayEntries]);
 
-  // ✅ Kidney report uses LAST 7 (rolling) + includes week number
+  //Kidney report uses lst 7 (rolling) + includes week number
   const weeklyReport = useMemo(() => {
     if (weeklyAverages.length < 7) {
       return {
@@ -504,6 +515,10 @@ export default function App() {
       color: statusColor,
     };
   }, [weeklyAverages, weekNumber]);
+
+  if (showSplash) {
+    return <SplashScreen />;
+  }
 
   return (
     <div className="wrap">

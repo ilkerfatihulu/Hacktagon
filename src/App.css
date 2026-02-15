@@ -186,10 +186,10 @@ body{
 .logText{ font-size: 13px; }
 
 .scaleCard{
-    /* Border rengini ve kalınlığını buradan ayarlayabilirsin */
-  border-radius: 8px;      /* Köşe yuvarlama (isteğe bağlı) */
-  padding: 10px;           /* İç boşluk */
-  margin: 5px;             /* Kartlar arasında mesafe */
+   
+  border-radius: 8px;     
+  padding: 10px;           
+  margin: 5px;             
   
   flex-direction: column;
   align-items: center;
@@ -254,15 +254,15 @@ body{
 
 .midBottom {
   display: flex;
-  justify-content: space-evenly;  /* Butonlar arasına eşit boşluk bırakır */
+  justify-content: space-evenly; 
   align-items: center;
   gap: 10px;
   margin-top: 6px;
-  width: 100%;  /* Tam genişlik */
+  width: 100%; 
 }
 
 .midBottom button {
-  flex: 1;  /* Butonlara eşit genişlik verir */
+  flex: 1; 
   padding: 10px;
   font-weight: bold;
 }
@@ -421,13 +421,13 @@ body{
   padding: 18px 0;
   border-bottom: none;
 
-  background: transparent;  /* 👈 DIŞ KATMAN ŞEFFAF */
+  background: transparent; 
   
 }
 
 .siteHeaderInner{
   width: min(1200px, 100%);
-  margin: 12px auto 0;  /* üstten biraz boşluk */
+  margin: 12px auto 0; 
   padding: 12px 18px;
   box-shadow: var(--shadow); 
   transition: box-shadow 0.2s ease, transform 0.2s ease;
@@ -438,9 +438,9 @@ body{
   gap: 16px;
   
 
-  background: #ffffff;          /* kart gibi dursun */
-  border-radius: 16px;          /* 👈 köşeleri yuvarla */
-  box-shadow: 0 8px 24px rgba(0,0,0,0.30); /* hafif gölge (opsiyonel) */
+  background: #ffffff;          
+  border-radius: 16px;          
+  box-shadow: 0 8px 24px rgba(0,0,0,0.30); 
   font-family: 'Orbitron', sans-serif;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -476,7 +476,7 @@ body{
 
 .tagline{
   font-family: 'Work Sans', cursive;
-  font-weight: 400;        /* tek seçenek */
+  font-weight: 400;        
   letter-spacing: 1px;
   font-size: 25px;
   opacity: 0.9;
@@ -493,13 +493,11 @@ body{
     font-size: 18px;
   }
 }
-/* Sayfanın genel arka planı */
+
 html, body, #root {
-  background: #FFFDF2;   /* 👈 istediğin renk */
+  background: #FFFDF2;  
 }
-/* ============================================================
-   STYLE A: PHOTO ANALYZE (Animated / Disappearing Text)
-   ============================================================ */
+
    .photo-upload-btn {
     font-family: inherit;
     font-size: 14px;
@@ -516,7 +514,7 @@ html, body, #root {
     height: 40px;
     flex: 1;
     justify-content: center;
-    margin-left: auto;   /* 👈 sadece bunu ekle */
+    margin-left: auto;  
   }
   
 
@@ -557,9 +555,7 @@ html, body, #root {
   transform: scale(0.95);
 }
 
-/* ============================================================
-   STYLE B: END THE DAY (3D Floating Style)
-   ============================================================ */
+
 .primaryBtn {
   background: #000000;
 
