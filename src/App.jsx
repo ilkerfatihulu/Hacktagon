@@ -182,7 +182,7 @@ export default function App() {
 
   // --- Chatbot State ---
   const [chatMessages, setChatMessages] = useState([
-    { id: 1, text: "Hi! I'm Peki, your virtual assistant. How can I help you?", sender: 'bot', time: formatTime(Date.now()) }
+    { id: 1, text: "Hi! I'm KidneyBot, your virtual assistant. How can I help you?", sender: 'bot', time: formatTime(Date.now()) }
   ]);
   const [chatInput, setChatInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -525,14 +525,13 @@ export default function App() {
         {/* LEFT */}
         <section className="col leftCol" aria-label="Tips and summary">
           <div className="card tipCard">
-            <h3>Weekly tip</h3>
+            <h3>Weekly Tip</h3>
             <p>{weeklyTip}</p>
             {tipLoading ? <p className="muted small">Updating tip…</p> : null}
-            
           </div>
 
           <div className="card tipCard">
-            <h3 style={{ marginBottom: "8px" }}>
+            <h3 style={{ marginBottom: "6px" }}>
               Urine Analysis:{" "}
               <span style={{ color: urineInsight.color }}>{urineInsight.label}</span>
             </h3>
@@ -545,9 +544,8 @@ export default function App() {
             </div>
           </div>
 
-          <div className="card tipCard" style={{ marginTop: "15px" }}>
+          <div className="card tipCard" style={{ marginTop: "1px" }}>
             <h3 style={{ marginBottom: "8px" }}>{weeklyReport.title}</h3>
-
             {weeklyReport.ready ? (
               <>
                 <div style={{ marginBottom: "10px" }}>
@@ -732,9 +730,9 @@ export default function App() {
           </ol>
         </div>
 
-        <div className="card aiCard" style={{ padding: 0, display: 'flex', flexDirection: 'column', height: '550px', overflow: 'hidden' }}>
+        <div className="card aiCard" style={{ padding: 0, display: 'flex', flexDirection: 'column', height: '600px', overflow: 'hidden' }}>
   {/* Chat Header */}
-  <div style={{ backgroundColor: '#2563eb', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+  <div style={{ backgroundColor: '#000000', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
     <span style={{ color: 'white', fontWeight: '600' }}>Virtual assistant</span>
     <Minus size={20} color="white" style={{ cursor: 'pointer' }} />
   </div>
@@ -746,7 +744,7 @@ export default function App() {
         <div style={{ maxWidth: '85%' }}>
            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
               {msg.sender === 'bot' && <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>🤖</div>}
-              <span style={{ fontSize: '12px', color: '#6b7280' }}>{msg.sender === 'bot' ? 'Peki' : 'You'}</span>
+              <span style={{ fontSize: '12px', color: '#6b7280' }}>{msg.sender === 'bot' ? 'KidneyBot' : 'You'}</span>
            </div>
            <div style={{ 
              padding: '12px', 
@@ -764,7 +762,7 @@ export default function App() {
         </div>
       </div>
     ))}
-    {isTyping && <div style={{ fontSize: '12px', color: '#9ca3af', italic: 'true' }}>Peki is typing...</div>}
+    {isTyping && <div style={{ fontSize: '12px', color: '#9ca3af', italic: 'true' }}>KidneyBot is typing...</div>}
     <div ref={chatEndRef} />
   </div>
 

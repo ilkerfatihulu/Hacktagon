@@ -190,11 +190,11 @@ body{
   border-radius: 8px;      /* Köşe yuvarlama (isteğe bağlı) */
   padding: 10px;           /* İç boşluk */
   margin: 5px;             /* Kartlar arasında mesafe */
-  display: flex;
+  
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+
 }
 .scaleHeader h3{ margin: 0; }
 .scaleHeader p{ margin: 6px 0 0; }
@@ -252,13 +252,21 @@ body{
   color: rgba(16,42,67,0.92);
 }
 
-.midBottom{
+.midBottom {
   display: flex;
+  justify-content: space-evenly;  /* Butonlar arasına eşit boşluk bırakır */
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
   margin-top: 6px;
+  width: 100%;  /* Tam genişlik */
 }
+
+.midBottom button {
+  flex: 1;  /* Butonlara eşit genişlik verir */
+  padding: 10px;
+  font-weight: bold;
+}
+
 
 .primaryBtn{
   background: var(--btn);
@@ -280,7 +288,7 @@ body{
 
 .chartCard h3{ margin: 0; }
 .chartBox{
-  height: 250px;
+  height: 230px;
   margin-top: 10px;
 }
 
@@ -495,7 +503,7 @@ html, body, #root {
    .photo-upload-btn {
     font-family: inherit;
     font-size: 14px;
-    background: #212121;
+    background: #000000;
     color: white;
     padding: 0 20px;
     display: flex;
@@ -553,7 +561,8 @@ html, body, #root {
    STYLE B: END THE DAY (3D Floating Style)
    ============================================================ */
 .primaryBtn {
-  background: var(--btn);
+  background: #000000;
+
   color: var(--btnText);
   border: 1px solid transparent;
   padding: 0 20px;
