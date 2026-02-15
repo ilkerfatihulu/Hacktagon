@@ -11,7 +11,7 @@ AI-Powered Hydration Coaching: Get personalized weekly tips based on your 7-day 
 
 Smart Photo Detection: Don't know your hydration level? Upload a photo, and our Pixel Analysis Algorithm will suggest the most accurate level.
 
-"Peki" AI Assistant: A real-time chatbot integrated via Google Gemini API to answer all your questions about kidney wellness and hydration essentials.
+"KidneyBot" AI Assistant: A real-time chatbot integrated via Google Gemini API to answer all your questions about kidney wellness and hydration essentials.
 
 Privacy-First Architecture: Your health data is yours alone. We use a Local-First strategy where all entries are stored on your device using localStorage.
 
