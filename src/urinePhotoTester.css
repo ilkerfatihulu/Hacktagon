@@ -1,0 +1,218 @@
+.upt-wrap {
+    padding: 24px;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  }
+  
+  .upt-card {
+    max-width: 1100px;
+    margin: 0 auto;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    background: white;
+  }
+  
+  .upt-title {
+    margin: 0 0 6px;
+    font-size: 20px;
+  }
+  
+  .upt-sub {
+    margin: 0 0 14px;
+    color: rgba(0,0,0,0.65);
+    line-height: 1.35;
+  }
+  
+  .upt-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  
+  .upt-btn {
+    border: 1px solid rgba(0,0,0,0.12);
+    background: #0b5cff;
+    color: white;
+    padding: 10px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+  }
+  
+  .upt-btn.secondary {
+    background: white;
+    color: #0b5cff;
+  }
+  
+  .upt-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .upt-slider {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 12px;
+    background: rgba(0,0,0,0.02);
+  }
+  
+  .upt-main {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 14px;
+  }
+  
+  .upt-canvasWrap {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.10);
+    background: rgba(0,0,0,0.03);
+    min-height: 360px;
+  }
+  
+  .upt-canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  
+  .upt-placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: rgba(0,0,0,0.55);
+    font-weight: 600;
+  }
+  
+  .upt-side {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .upt-panel {
+    border: 1px solid rgba(0,0,0,0.10);
+    border-radius: 14px;
+    padding: 12px;
+    background: rgba(0,0,0,0.015);
+  }
+  
+  .upt-panel h3 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+  }
+  
+  .upt-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  .upt-swatch {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.12);
+  }
+  
+  .upt-big {
+    font-size: 16px;
+    font-weight: 800;
+  }
+  
+  .upt-small {
+    color: rgba(0,0,0,0.6);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  
+  .upt-muted {
+    color: rgba(0,0,0,0.55);
+    font-size: 12px;
+  }
+  
+  .upt-error {
+    background: rgba(255, 0, 0, 0.08);
+    border: 1px solid rgba(255, 0, 0, 0.18);
+    padding: 8px 10px;
+    border-radius: 12px;
+    color: rgba(120, 0, 0, 0.9);
+    font-weight: 600;
+  }
+  
+  .upt-miniList {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .upt-miniTitle {
+    font-size: 12px;
+    color: rgba(0,0,0,0.6);
+    font-weight: 700;
+  }
+  
+  .upt-miniItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: white;
+  }
+  
+  .upt-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.12);
+    margin-right: 8px;
+    display: inline-block;
+  }
+  
+  .upt-palette {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  
+  .upt-pItem {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: white;
+    font-size: 12px;
+  }
+  
+  .upt-note {
+    color: rgba(0,0,0,0.65);
+    font-size: 12px;
+    line-height: 1.35;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(11, 92, 255, 0.04);
+  }
+  
+  @media (max-width: 900px) {
+    .upt-main {
+      grid-template-columns: 1fr;
+    }
+  }
+  

@@ -317,3 +317,9 @@ body{
   .tipCard{ border-radius: var(--radius); min-height: auto; }
   .chartBox{ height: 240px; }
 }
+.midBottom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}

@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { generateWeeklyTip } from "./gemini";
+import PhotoAnalyzeButton from "./PhotoAnalyzeButton";
+
 
 import {
   Chart as ChartJS,
@@ -104,10 +106,10 @@ function compute7DayTrend(nextWeekly) {
     prev7Avg == null || last7Avg == null
       ? "stable"
       : last7Avg < prev7Avg
-      ? "improving"
-      : last7Avg > prev7Avg
-      ? "getting darker"
-      : "stable";
+        ? "improving"
+        : last7Avg > prev7Avg
+          ? "getting darker"
+          : "stable";
 
   return { last7Avg, prev7Avg, trend };
 }
@@ -368,13 +370,13 @@ export default function App() {
     return `Weekly avg: ${last7Avg} (trend: ${trend}). ${note}`;
   }, [weeklyAverages]);
 
-const urineInsight = useMemo(() => {
-  const lastValue = todayEntries.length ? todayEntries[todayEntries.length - 1].value : null;
-  if (!lastValue) return { label: "No Data", text: "Log a color to see hydration insights.", action: "Waiting for log...", color: "#666" };
-  return URINE_INSIGHTS[lastValue];
-}, [todayEntries]);
+  const urineInsight = useMemo(() => {
+    const lastValue = todayEntries.length ? todayEntries[todayEntries.length - 1].value : null;
+    if (!lastValue) return { label: "No Data", text: "Log a color to see hydration insights.", action: "Waiting for log...", color: "#666" };
+    return URINE_INSIGHTS[lastValue];
+  }, [todayEntries]);
 
-const weeklyReport = useMemo(() => {
+  const weeklyReport = useMemo(() => {
     // Check if we have at least 7 days of data
     if (weeklyAverages.length < 7) {
       return {
@@ -387,7 +389,7 @@ const weeklyReport = useMemo(() => {
 
     // Calculate the average of the last 7 days
     const totalAvg = weeklyAverages.reduce((sum, day) => sum + day.avg, 0) / 7;
-    
+
     let reportText = "";
     let statusLabel = "";
     let statusColor = "";
@@ -453,10 +455,10 @@ const weeklyReport = useMemo(() => {
 
           {/* UPDATED URINE INSIGHT BOX */}
           <div className="card tipCard">
-              <h3 style={{ marginBottom: "8px" }}>
-                Urine Analysis: <span style={{ color: urineInsight.color }}>{urineInsight.label}</span>
-              </h3>
-              <p style={{ fontSize: "0.95rem", lineHeight: "1.4" }}>{urineInsight.text}</p>
+            <h3 style={{ marginBottom: "8px" }}>
+              Urine Analysis: <span style={{ color: urineInsight.color }}>{urineInsight.label}</span>
+            </h3>
+            <p style={{ fontSize: "0.95rem", lineHeight: "1.4" }}>{urineInsight.text}</p>
             <div style={{ marginTop: "12px", borderTop: "1px solid #eee", paddingTop: "8px" }}>
               <p className="muted small" style={{ marginBottom: "4px" }}>Hydration Advice:</p>
               <strong>{urineInsight.action}</strong>
@@ -468,7 +470,7 @@ const weeklyReport = useMemo(() => {
             <h3 style={{ marginBottom: "8px" }}>
               {weeklyReport.title}
             </h3>
-            
+
             {weeklyReport.ready ? (
               <>
                 <div style={{ marginBottom: "10px" }}>
@@ -481,18 +483,18 @@ const weeklyReport = useMemo(() => {
                 <p className="muted">{weeklyReport.text}</p>
                 {/* Visual Progress Bar */}
                 <div style={{ width: "100%", background: "#eee", height: "8px", borderRadius: "4px", marginTop: "10px" }}>
-                  <div style={{ 
-                    width: `${(weeklyAverages.length / 7) * 100}%`, 
-                    background: "#3498db", 
-                    height: "100%", 
+                  <div style={{
+                    width: `${(weeklyAverages.length / 7) * 100}%`,
+                    background: "#3498db",
+                    height: "100%",
                     borderRadius: "4px",
-                    transition: "width 0.3s ease" 
+                    transition: "width 0.3s ease"
                   }}></div>
                 </div>
               </div>
             )}
           </div>
-          
+
           <div className="card bigCard">
             <div className="rowBetween">
               <h3>AI Weekly Summary</h3>
@@ -516,7 +518,7 @@ const weeklyReport = useMemo(() => {
                 <div className="statValue">{weeklyAverages.length}</div>
               </div>
             </div>
-        
+
             <div className="log">
               <div className="logHeader">
                 <span>Today’s log</span>
@@ -574,6 +576,13 @@ const weeklyReport = useMemo(() => {
               >
                 {tipLoading ? "Updating tip..." : "End the day"}
               </button>
+              <PhotoAnalyzeButton
+                onDetectedLevel={(level) => {
+                  // Burada senin mevcut loglama fonksiyonunu çağır:
+                  // Örn: addEntry(level) / logColor(level) / addColor(level)
+                  addEntry(level); // <-- kendi fonksiyon adına göre değiştir
+                }}
+              />
               <div className="dayCounter" aria-label="Day counter">
                 Day <strong>{dayCount}</strong>
               </div>
