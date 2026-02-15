@@ -644,7 +644,40 @@ html, body, #root {
   font-size: 30px;
   letter-spacing: 1px;
 }
+.getStartedCard {
+  position: relative;
+  overflow: hidden;
+  background: url("/kidney.jpg") center / cover no-repeat;
+  box-shadow: var(--shadow);
+}
+.getStartedCard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.92); /* beyaz saydam overlay */
+  z-index: 0;
+}
 
+
+.getStartedCard > * {
+  position: relative;
+  z-index: 1;
+}
+/* Başlık */
+.getStartedCard .gsTitle {
+  color: #0f172a;
+  font-weight: 800;
+}
+.getStartedCard .gsSubTitle {
+  color: #0f172a;
+  margin-top: 12px;
+}
+.getStartedCard .gsList {
+  color: #102a43;
+}
+.getStartedCard .gsList strong {
+  color: #0f172a;
+}
 
 
 
