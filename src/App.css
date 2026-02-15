@@ -323,3 +323,19 @@ body{
   gap: 10px;
   flex-wrap: wrap;
 }
+.wrap::before,
+.wrap::after,
+.grid::before,
+.grid::after {
+  content: none !important;
+  display: none !important;
+}
+
+.wrap {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+.topHeader {
+  display: none !important;
+}
+

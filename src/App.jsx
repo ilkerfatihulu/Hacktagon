@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { generateWeeklyTip } from "./gemini";
 import PhotoAnalyzeButton from "./PhotoAnalyzeButton";
 
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -106,10 +105,10 @@ function compute7DayTrend(nextWeekly) {
     prev7Avg == null || last7Avg == null
       ? "stable"
       : last7Avg < prev7Avg
-        ? "improving"
-        : last7Avg > prev7Avg
-          ? "getting darker"
-          : "stable";
+      ? "improving"
+      : last7Avg > prev7Avg
+      ? "getting darker"
+      : "stable";
 
   return { last7Avg, prev7Avg, trend };
 }
@@ -152,16 +151,13 @@ export default function App() {
       const cacheKey = `weeklyTip:week${weekIndex}`;
       const cached = localStorage.getItem(cacheKey);
 
-      if (cached) {
-        setWeeklyTip(cached);
-      } else {
-        setWeeklyTip("Weekly tip is ready—press End the day once to generate it.");
-      }
+      if (cached) setWeeklyTip(cached);
+      else setWeeklyTip("Weekly tip is ready—press End the day once to generate it.");
     } else {
       const remaining = 7 - (completedDays % 7);
       setWeeklyTip(`Log ${remaining} more day(s) to unlock your weekly tip.`);
     }
-  }, []);
+  }, []); // intentionally run once on mount
 
   const todayAvg = useMemo(() => {
     if (!todayEntries.length) return null;
@@ -196,6 +192,7 @@ export default function App() {
     setTodayEntries([]);
     setSelectedColor(null);
     setDayCount((d) => d + 1);
+
     showToast(`Saved today's average: ${avg}`);
 
     const completedDays = nextWeekly.length;
@@ -226,11 +223,11 @@ export default function App() {
         }
 
         const tip = await generateWeeklyTip({ last7Avg, trend });
-        const finalTip = (tip && String(tip).trim()) ? String(tip).trim() : quick;
+        const finalTip = tip && String(tip).trim() ? String(tip).trim() : quick;
 
         setWeeklyTip(finalTip);
         localStorage.setItem(cacheKey, finalTip);
-      } catch (e) {
+      } catch {
         setTipErr("Weekly tip update failed (using fallback).");
       } finally {
         setTipLoading(false);
@@ -355,12 +352,18 @@ export default function App() {
 
   const urineInsight = useMemo(() => {
     const lastValue = todayEntries.length ? todayEntries[todayEntries.length - 1].value : null;
-    if (!lastValue) return { label: "No Data", text: "Log a color to see hydration insights.", action: "Waiting for log...", color: "#666" };
+    if (!lastValue) {
+      return {
+        label: "No Data",
+        text: "Log a color to see hydration insights.",
+        action: "Waiting for log...",
+        color: "#666",
+      };
+    }
     return URINE_INSIGHTS[lastValue];
   }, [todayEntries]);
 
   const weeklyReport = useMemo(() => {
-
     if (weeklyAverages.length < 7) {
       return {
         ready: false,
@@ -379,24 +382,31 @@ export default function App() {
     if (totalAvg <= 3) {
       statusLabel = "Excellent";
       statusColor = "#4caf50";
-      reportText = "Over the past week, your kidneys have maintained optimal filtration. Your hydration habits are consistent and healthy.";
+      reportText =
+        "Over the past week, your kidneys have maintained optimal filtration. Your hydration habits are consistent and healthy.";
     } else if (totalAvg <= 5) {
       statusLabel = "Good/Stable";
       statusColor = "#8bc34a";
-      reportText = "Your weekly average shows stable kidney function, though some days were more concentrated than others. Keep aiming for consistency.";
+      reportText =
+        "Your weekly average shows stable kidney function, though some days were more concentrated than others. Keep aiming for consistency.";
     } else {
       statusLabel = "At Risk of Strain";
       statusColor = "#e74c3c";
-      reportText = "Your kidneys have been consistently dealing with concentrated waste this week. This can increase the risk of kidney stones. Try to increase your daily water goal.";
+      reportText =
+        "Your kidneys have been consistently dealing with concentrated waste this week. This can increase the risk of kidney stones. Try to increase your daily water goal.";
     }
 
-    return { ready: true, title: "7-Day Kidney Report", text: reportText, status: statusLabel, color: statusColor };
+    return {
+      ready: true,
+      title: "7-Day Kidney Report",
+      text: reportText,
+      status: statusLabel,
+      color: statusColor,
+    };
   }, [weeklyAverages]);
 
   return (
     <div className="wrap">
-     
-
       <main className="grid" role="main">
         {/* LEFT */}
         <section className="col leftCol" aria-label="Tips and summary">
@@ -409,42 +419,50 @@ export default function App() {
 
           <div className="card tipCard">
             <h3 style={{ marginBottom: "8px" }}>
-              Urine Analysis: <span style={{ color: urineInsight.color }}>{urineInsight.label}</span>
+              Urine Analysis:{" "}
+              <span style={{ color: urineInsight.color }}>{urineInsight.label}</span>
             </h3>
             <p style={{ fontSize: "0.95rem", lineHeight: "1.4" }}>{urineInsight.text}</p>
             <div style={{ marginTop: "12px", borderTop: "1px solid #eee", paddingTop: "8px" }}>
-              <p className="muted small" style={{ marginBottom: "4px" }}>Hydration Advice:</p>
+              <p className="muted small" style={{ marginBottom: "4px" }}>
+                Hydration Advice:
+              </p>
               <strong>{urineInsight.action}</strong>
             </div>
           </div>
 
           <div className="card tipCard" style={{ marginTop: "15px" }}>
-
-            <h3 style={{ marginBottom: "8px" }}>
-              {weeklyReport.title}
-            </h3>
-
+            <h3 style={{ marginBottom: "8px" }}>{weeklyReport.title}</h3>
 
             {weeklyReport.ready ? (
               <>
                 <div style={{ marginBottom: "10px" }}>
-                  Status: <strong style={{ color: weeklyReport.color }}>{weeklyReport.status}</strong>
+                  Status:{" "}
+                  <strong style={{ color: weeklyReport.color }}>{weeklyReport.status}</strong>
                 </div>
                 <p style={{ fontSize: "0.95rem", lineHeight: "1.4" }}>{weeklyReport.text}</p>
               </>
             ) : (
               <div style={{ textAlign: "center", padding: "10px 0" }}>
                 <p className="muted">{weeklyReport.text}</p>
-                <div style={{ width: "100%", background: "#eee", height: "8px", borderRadius: "4px", marginTop: "10px" }}>
-
-                  <div style={{
-                    width: `${(weeklyAverages.length / 7) * 100}%`,
-                    background: "#3498db",
-                    height: "100%",
+                <div
+                  style={{
+                    width: "100%",
+                    background: "#eee",
+                    height: "8px",
                     borderRadius: "4px",
-                    transition: "width 0.3s ease"
-                  }}></div>
-
+                    marginTop: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${(weeklyAverages.length / 7) * 100}%`,
+                      background: "#3498db",
+                      height: "100%",
+                      borderRadius: "4px",
+                      transition: "width 0.3s ease",
+                    }}
+                  />
                 </div>
               </div>
             )}
@@ -457,6 +475,7 @@ export default function App() {
                 Reset
               </button>
             </div>
+
             <p className="muted">{aiSummary}</p>
 
             <div className="stats">
@@ -479,6 +498,7 @@ export default function App() {
                 <span>Today’s log</span>
                 <span className="muted small">({todayEntries.length ? "latest last" : "empty"})</span>
               </div>
+
               <ul className="logList" aria-label="Today entries list">
                 {todayEntries.length ? (
                   [...todayEntries].slice(-8).map((e, idx) => (
@@ -498,11 +518,9 @@ export default function App() {
           </div>
         </section>
 
-        {/* MIDDLE */}
+        {/* MIDDLE (DÜZELTİLDİ: boş card yok, her şey scaleCard içinde) */}
         <section className="col midCol" aria-label="Urine color scale">
           <div className="card scaleCard">
-          </div>  {/* card scaleCard kapanışı */}
-
             <div className="scaleHeader">
               <h3>Urine color (1–8)</h3>
               <p className="muted small">Keyboard: Tab → Enter/Space to log.</p>
@@ -529,17 +547,9 @@ export default function App() {
                 {tipLoading ? "Updating tip..." : "End the day"}
               </button>
 
-              <PhotoAnalyzeButton
-                onDetectedLevel={(level) => {
-                  // Burada senin mevcut loglama fonksiyonunu çağır:
-                  // Örn: addEntry(level) / logColor(level) / addColor(level)
-                  addEntry(level); // <-- kendi fonksiyon adına göre değiştir
-                }}
-              />
+              <PhotoAnalyzeButton onDetectedLevel={(level) => addEntry(level)} />
+
               <div className="dayCounter" aria-label="Day counter">
-
-              <div className="dayCounter">
-
                 Day <strong>{dayCount}</strong>
               </div>
             </div>
