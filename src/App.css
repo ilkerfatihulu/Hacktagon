@@ -678,6 +678,10 @@ html, body, #root {
 .getStartedCard .gsList strong {
   color: #0f172a;
 }
+.tipEmoji {
+  margin-right: 6px;
+  font-size: 1.1em;
+}
 
 
 

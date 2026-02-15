@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import PhotoAnalyzeButton from "./PhotoAnalyzeButton";
-import { generateWeeklyTip, runChat } from "./gemini"; 
+import { generateWeeklyTip, runChat } from "./gemini";
 import { Send, Paperclip, Minus } from 'lucide-react';
 
 
@@ -148,10 +148,10 @@ function compute7DayTrend(nextWeekly) {
     prev7Avg == null || last7Avg == null
       ? "stable"
       : last7Avg < prev7Avg
-      ? "improving"
-      : last7Avg > prev7Avg
-      ? "getting darker"
-      : "stable";
+        ? "improving"
+        : last7Avg > prev7Avg
+          ? "getting darker"
+          : "stable";
 
   return { last7Avg, prev7Avg, trend };
 }
@@ -525,14 +525,16 @@ export default function App() {
         {/* LEFT */}
         <section className="col leftCol" aria-label="Tips and summary">
           <div className="card tipCard">
-            <h3>Weekly Tip</h3>
+            <h3>
+              <span className="tipEmoji"></span>Weekly Insights 
+            </h3>
             <p>{weeklyTip}</p>
             {tipLoading ? <p className="muted small">Updating tip…</p> : null}
           </div>
 
           <div className="card tipCard">
             <h3 style={{ marginBottom: "6px" }}>
-              Urine Analysis:{" "}
+            Urine Analysis:{" "}
               <span style={{ color: urineInsight.color }}>{urineInsight.label}</span>
             </h3>
             <p style={{ fontSize: "0.95rem", lineHeight: "1.4" }}>{urineInsight.text}</p>
@@ -572,7 +574,7 @@ export default function App() {
             )}
           </div>
 
-          
+
         </section>
 
         {/* MIDDLE */}
@@ -581,7 +583,7 @@ export default function App() {
           <div className="card scaleCard">
             <div className="scaleHeader">
               <h3>Urine color (1–8)</h3>
-              
+
             </div>
 
             <div className="scale" role="list" aria-label="Urine color blocks">
@@ -612,13 +614,13 @@ export default function App() {
           </div>
 
           {/* 2) Progress card (AYRI KART) */}
-          
+
         </section>
 
         {/* RIGHT */}
         <section className="col rightCol" aria-label="Charts">
-          
-        <div className="card bigCard">
+
+          <div className="card bigCard">
             <div className="rowBetween">
               <h3>Weekly Summary</h3>
               <button className="ghostBtn" onClick={resetAll} aria-label="Reset demo data">
@@ -665,7 +667,7 @@ export default function App() {
                 )}
               </ul>
             </div>
-          </div> 
+          </div>
           <div className="card chartCard">
             <div className="rowBetween">
               <h3>Weekly chart</h3>
@@ -731,59 +733,59 @@ export default function App() {
         </div>
 
         <div className="card aiCard" style={{ padding: 0, display: 'flex', flexDirection: 'column', height: '600px', overflow: 'hidden' }}>
-  {/* Chat Header */}
-  <div style={{ backgroundColor: '#000000', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-    <span style={{ color: 'white', fontWeight: '600' }}>Virtual assistant</span>
-    <Minus size={20} color="white" style={{ cursor: 'pointer' }} />
-  </div>
-  
-  {/* Message Area */}
-  <div style={{ flex: 1, overflowY: 'auto', padding: '16px', backgroundColor: '#f9fafb' }}>
-    {chatMessages.map((msg) => (
-      <div key={msg.id} style={{ display: 'flex', justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start', marginBottom: '16px' }}>
-        <div style={{ maxWidth: '85%' }}>
-           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              {msg.sender === 'bot' && <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>🤖</div>}
-              <span style={{ fontSize: '12px', color: '#6b7280' }}>{msg.sender === 'bot' ? 'KidneyBot' : 'You'}</span>
-           </div>
-           <div style={{ 
-             padding: '12px', 
-             borderRadius: '16px', 
-             fontSize: '14px',
-             backgroundColor: msg.sender === 'user' ? '#2563eb' : 'white',
-             color: msg.sender === 'user' ? 'white' : '#1f2937',
-             border: msg.sender === 'user' ? 'none' : '1px solid #e5e7eb',
-             borderTopRightRadius: msg.sender === 'user' ? '0' : '16px',
-             borderTopLeftRadius: msg.sender === 'bot' ? '0' : '16px'
-           }}>
-             {msg.text}
-           </div>
-           <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '4px' }}>{msg.time}</div>
-        </div>
-      </div>
-    ))}
-    {isTyping && <div style={{ fontSize: '12px', color: '#9ca3af', italic: 'true' }}>KidneyBot is typing...</div>}
-    <div ref={chatEndRef} />
-  </div>
+          {/* Chat Header */}
+          <div style={{ backgroundColor: '#000000', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ color: 'white', fontWeight: '600' }}>Virtual assistant</span>
+            <Minus size={20} color="white" style={{ cursor: 'pointer' }} />
+          </div>
 
-  {/* Input Area */}
-  <div style={{ padding: '16px', borderTop: '1px solid #e5e7eb', backgroundColor: 'white' }}>
-    <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f3f4f6', borderRadius: '999px', padding: '8px 16px' }}>
-      <input 
-        type="text" 
-        placeholder="Type a message" 
-        style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: '14px' }}
-        value={chatInput}
-        onChange={(e) => setChatInput(e.target.value)}
-        onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-      />
-      <Paperclip size={18} color="#9ca3af" style={{ marginRight: '8px', cursor: 'pointer' }} />
-      <button onClick={handleSendMessage} style={{ border: 'none', background: 'none', cursor: 'pointer' }}>
-        <Send size={18} color="#2563eb" />
-      </button>
-    </div>
-  </div>
-</div>
+          {/* Message Area */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '16px', backgroundColor: '#f9fafb' }}>
+            {chatMessages.map((msg) => (
+              <div key={msg.id} style={{ display: 'flex', justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start', marginBottom: '16px' }}>
+                <div style={{ maxWidth: '85%' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    {msg.sender === 'bot' && <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>🤖</div>}
+                    <span style={{ fontSize: '12px', color: '#6b7280' }}>{msg.sender === 'bot' ? 'KidneyBot' : 'You'}</span>
+                  </div>
+                  <div style={{
+                    padding: '12px',
+                    borderRadius: '16px',
+                    fontSize: '14px',
+                    backgroundColor: msg.sender === 'user' ? '#2563eb' : 'white',
+                    color: msg.sender === 'user' ? 'white' : '#1f2937',
+                    border: msg.sender === 'user' ? 'none' : '1px solid #e5e7eb',
+                    borderTopRightRadius: msg.sender === 'user' ? '0' : '16px',
+                    borderTopLeftRadius: msg.sender === 'bot' ? '0' : '16px'
+                  }}>
+                    {msg.text}
+                  </div>
+                  <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '4px' }}>{msg.time}</div>
+                </div>
+              </div>
+            ))}
+            {isTyping && <div style={{ fontSize: '12px', color: '#9ca3af', italic: 'true' }}>KidneyBot is typing...</div>}
+            <div ref={chatEndRef} />
+          </div>
+
+          {/* Input Area */}
+          <div style={{ padding: '16px', borderTop: '1px solid #e5e7eb', backgroundColor: 'white' }}>
+            <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f3f4f6', borderRadius: '999px', padding: '8px 16px' }}>
+              <input
+                type="text"
+                placeholder="Type a message"
+                style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: '14px' }}
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              />
+              <Paperclip size={18} color="#9ca3af" style={{ marginRight: '8px', cursor: 'pointer' }} />
+              <button onClick={handleSendMessage} style={{ border: 'none', background: 'none', cursor: 'pointer' }}>
+                <Send size={18} color="#2563eb" />
+              </button>
+            </div>
+          </div>
+        </div>
       </section>
 
       <footer className="footerNote">
