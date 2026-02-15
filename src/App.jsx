@@ -583,7 +583,7 @@ export default function App() {
           <div className="card scaleCard">
             <div className="scaleHeader">
               <h3>Urine color (1–8)</h3>
-              <p className="muted small">Keyboard: Tab → Enter/Space to log.</p>
+              
             </div>
 
             <div className="scale" role="list" aria-label="Urine color blocks">
