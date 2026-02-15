@@ -528,7 +528,7 @@ export default function App() {
             <h3>Weekly tip</h3>
             <p>{weeklyTip}</p>
             {tipLoading ? <p className="muted small">Updating tip…</p> : null}
-            {tipErr ? <p className="muted small">{tipErr}</p> : null}
+            
           </div>
 
           <div className="card tipCard">
